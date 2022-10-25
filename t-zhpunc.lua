@@ -1,5 +1,5 @@
 Moduledata = Moduledata or {}
-Moduledata.zhspuncs = Moduledata.zhspuncs or {}
+Moduledata.zhpunc = Moduledata.zhpunc or {}
 -- 配合直排
 Moduledata.vertical_typeset = Moduledata.vertical_typeset or {}
 Moduledata.vertical_typeset.appended = Moduledata.vertical_typeset.appended or false
@@ -7,10 +7,27 @@ Moduledata.vertical_typeset.appended = Moduledata.vertical_typeset.appended or f
 -- 直排模块（判断是否挂载直排，以便处理旋转的标点）
 Moduledata.vertical_typeset = Moduledata.vertical_typeset or {}
 
+-- 标点模式配置，默认全角
+local quanjiao, kaiming, banjiao, yuanyang, hangjian = "quanjiao", "kaiming", "banjiao","yuanyang","hangjian"
+Moduledata.zhpunc.model = Moduledata.zhpunc.model or quanjiao
+-- 
+-- 临时设置 TODO 用户接口
+-- 
+Moduledata.zhpunc.model = yuanyang
+Moduledata.zhpunc.model = kaiming
+Moduledata.zhpunc.model = banjiao
+Moduledata.zhpunc.model = quanjiao
+-- Moduledata.zhpunc.model = hangjian -- TODO
+local model = Moduledata.zhpunc.model
 
-local hlist = nodes.nodecodes.hlist
+-- 加空调整比例配置（默认百分百）
+local space_factor = Moduledata.zhpunc.space_factor or 1
+
+local hlist_id   = nodes.nodecodes.hlist
+local vlist_id   = nodes.nodecodes.vlist
+local rule_id    = nodes.nodecodes.rule
 local glyph_id   = nodes.nodecodes.glyph --node.id ('glyph')
-local glue_id   = nodes.nodecodes.glue
+local glue_id    = nodes.nodecodes.glue
 
 local fonthashes = fonts.hashes
 local fontdata   = fonthashes.identifiers --字体身份表
@@ -19,6 +36,9 @@ local node_traverse = node.traverse
 local node_insertbefore = node.insertbefore
 local node_insertafter = node.insertafter
 local nodes_pool_kern = nodes.pool.kern
+local node_new = node.new
+local node_copy = node.copy
+local node_remove = node.remove
 local nodes_tasks_appendaction = nodes.tasks.appendaction
 local tex_sp = tex.sp
 
@@ -44,9 +64,6 @@ local function show_detail(n, label)
 end
 --]]
 
--- TODO：
--- 调整为c-p-c、c-p--p-c六种数据（目前缺cp--pc两种）；
--- 再左、右、中标点分组
 
 -- 标点缓存数据
 -- {
@@ -58,57 +75,104 @@ end
 -- }
 local puncs_font = {}
 
--- 左半标点
-local puncs_left = {
-    [0x2018] = true, -- ‘
-    [0x201C] = true, -- “
-    [0x3008] = true, -- 〈
-    [0x300A] = true, -- 《
-    [0x300C] = true, -- 「
-    [0x300E] = true, -- 『
-    [0x3010] = true, -- 【
-    [0x3014] = true, -- 〔
-    [0x3016] = true, -- 〖
-    [0xFF08] = true, -- （
-    [0xFF3B] = true, -- ［
-    [0xFF5B] = true, -- ｛
-}
+-- 标点分类
+-- 语义单元前
+local puncs_left_sign     = 'puncs_left_sign'     -- 左半标号，如《
+-- 语义单元后
+local puncs_right_sign    = 'puncs_right_sign'    -- 右半标号，如》
+local puncs_inner_point   = 'puncs_inner_point'   -- 句内点号，如、
+local puncs_ending_point  = 'puncs_ending_point'  -- 句末点号，如。
+-- 语义单元中(视同)
+local puncs_ellipsis      = 'puncs_ellipsis'      -- 省略号…
+local puncs_dash          = 'puncs_dash'          -- 破折号—
+-- 语义单元中
+local puncs_full_junction = 'puncs_full_junction' -- 全角连接号～
+local puncs_half_junction = 'puncs_half_junction' -- 半角连接号，如-
+-- 非
+local puncs_no            = 'puncs_no'          -- 非标点的可视结点
 
--- 右标点
-local puncs_right = {
-    -- 右半标点
-    [0x2019] = true, -- ’
-    [0x201D] = true, -- ”
-    [0x3009] = true, -- 〉
-    [0x300B] = true, -- 》
-    [0x300D] = true, -- 」
-    [0x300F] = true, -- 』
-    [0x3011] = true, -- 】
-    [0x3015] = true, -- 〕
-    [0x3017] = true, -- 〗
-    [0xFF09] = true, -- ）
-    [0xFF3D] = true, -- ］
-    [0xFF5D] = true, -- ｝
-    -- 单右标点
-    [0x3001] = true,   -- 、
-    [0x3002] = true,   -- 。
-    [0xFF0C] = true,   -- ，
-    [0xFF0E] = true,   -- ．
-    [0xFF1A] = true,   -- ：
-    [0xFF1B] = true,   -- ；
-    [0xFF01] = true,   -- ！
-    [0xFF1F] = true,   -- ？
-    [0xFF05] = true,    -- ％
-    [0x2500] = true,    -- ─
-    -- 双用左右皆可，单用仅在文右
-    [0x2014] = true, -- — 半字线
-    [0x2026] = true, -- …
+-- 加空配置
+local inserting_space = {
+    -- 开明
+    [kaiming] = {
+        [puncs_ending_point] =   {puncs_left_sign = 0.5,  --。《
+                                  puncs_no        = 0.5}, --。囗
+    },
+    -- 全角
+    [quanjiao] = {
+        [puncs_no]           =   {puncs_left_sign = 0.5}, --囗《
+        [puncs_right_sign]   =   {puncs_left_sign = 0.5,  --》《
+                                  puncs_no        = 0.5}, --》囗
+        [puncs_inner_point]  =   {puncs_left_sign = 0.5,  --、《
+                                  puncs_no        = 0.5}, --、囗
+        [puncs_ending_point] =   {puncs_left_sign = 0.5,  --。《
+                                  puncs_no        = 0.5}, --。囗
+    },
 }
 
 -- 所有标点
-local puncs = table.merged(puncs_left, puncs_right)
+local puncs = {
+    -- 左半标号
+    [0x2018] = puncs_left_sign, -- ‘
+    [0x201C] = puncs_left_sign, -- “
+    [0x3008] = puncs_left_sign, -- 〈
+    [0x300A] = puncs_left_sign, -- 《
+    [0x3010] = puncs_left_sign, -- 【
+    [0x3014] = puncs_left_sign, -- 〔
+    [0xFF08] = puncs_left_sign, -- （
+    [0xFF3B] = puncs_left_sign, -- ［
+    -- ext
+    [0x300C] = puncs_left_sign, -- 「
+    [0x300E] = puncs_left_sign, -- 『
+    [0x3016] = puncs_left_sign, -- 〖
+    [0xFF5B] = puncs_left_sign, -- ｛
 
--- 旋转过的标点/竖排标点（装在hlist中）
+    -- 右半标号
+    [0x2019] = puncs_right_sign, -- ’
+    [0x201D] = puncs_right_sign, -- ”
+    [0x3009] = puncs_right_sign, -- 〉
+    [0x300B] = puncs_right_sign, -- 》
+    [0x3011] = puncs_right_sign, -- 】
+    [0x3015] = puncs_right_sign, -- 〕
+    [0xFF09] = puncs_right_sign, -- ）
+    [0xFF3D] = puncs_right_sign, -- ］
+    -- ext
+    [0x300D] = puncs_right_sign, -- 」
+    [0x300F] = puncs_right_sign, -- 』
+    [0x3017] = puncs_right_sign, -- 〗
+    [0xFF5D] = puncs_right_sign, -- ｝
+
+    -- 句内点号
+    [0x3001] = puncs_inner_point,   -- 、
+    [0xFF0C] = puncs_inner_point,   -- ，
+    [0xFF1A] = puncs_inner_point,   -- ：
+    [0xFF1B] = puncs_inner_point,   -- ；
+
+    -- 句末点号
+    [0xFF01] = puncs_ending_point,   -- ！
+    [0xFF1F] = puncs_ending_point,   -- ？
+    [0x3002] = puncs_ending_point,   -- 。
+    -- ext
+    [0xFF0E] = puncs_ending_point,   -- ．
+
+    -- 省略号
+    [0x2026] = puncs_ellipsis, -- …
+
+    -- 破折号
+    [0x2014] = puncs_dash, -- — 半字线，兼puncs_full_junction
+
+    -- 全角连接号
+    [0xff5e] = puncs_full_junction, -- ～ 半字线
+
+    -- 半角连接号
+    [0x00b7] = puncs_half_junction, -- ·   MIDDLE DOT
+    [0x002D] = puncs_half_junction, -- -   Hyphen-Minus. Will there be any side effects?
+    [0x002F] = puncs_half_junction, -- /   Solidus
+    -- ext
+    [0xff0f] = puncs_half_junction, -- ／   Solidus
+}
+
+-- 竖排时要旋转的标点/竖排标点（装在hlist中）
 local puncs_to_rotate = {
     [0x3001] = true,   -- 、
     [0x3002] = true,   -- 。
@@ -121,9 +185,9 @@ local puncs_to_rotate = {
     [0xFF1F] = true,   -- ？
 }
 
--- 是标点结点(false, 一般:1, 将要旋转:2)
--- @glyph | hlist n 结点
--- @return false | 1 | 2
+-- 是标点结点
+-- @n: glyph | hlist
+-- @return: false | 1 | 2 （不是标点 | 一般标点 | 将要旋转的标点）
 local function is_punc(n)
     if n.id == glyph_id then
         -- 直排旋转标点
@@ -139,67 +203,63 @@ local function is_punc(n)
     end
 end
 
--- 是左标点
-local function is_left_punc(n)
-    if puncs_left[n.char] then
+-- 是左标号
+local function is_left_sign(n)
+    if puncs[n.char] == puncs_left_sign then
         return true
     else
         return false
     end
 end
 
--- 后一个字符节点是标点
-local function next_is_punc(n)
+local function is_visible_node(n)
+    local ids = {
+        [hlist_id] = true,
+        [vlist_id] = true,
+        [rule_id ] = true,
+        [glyph_id] = true,
+    }
+    if ids[n.id] then --  and n.width > 0且有实际宽度（必要吗？？？）
+        return true
+    else
+        return false
+    end
+end
+
+-- 后一个可见节点是标点
+local function next_punc(n)
     local next_n = n.next
     while next_n do
-        if next_n.id == glyph_id then
+        if is_visible_node(next_n) then
             if is_punc(next_n) then
-                return true
+                return next_n
             else
                 return false
             end
         end
         next_n = next_n.next
     end
+    return nil -- n顶头
 end
 
--- 前一个字符节点是标点
-local function prev_is_punc(n)
+-- 前一个可见节点是标点
+local function prev_punc(n)
     local prev_n = n.prev
     while prev_n do
-        if prev_n.id == glyph_id then
+        if is_visible_node(prev_n) then
             if is_punc(prev_n) then
-                return true
+                return prev_n
             else
                 return false
             end
         end
         prev_n = prev_n.prev
     end
-end
-
--- 本结点与前后是不是标点：false，only，with_pre， with_next，all
-local function is_zhcnpunc_node_group (n)
-    local prev = prev_is_punc(n)
-    local current = is_punc(n)
-    local next = next_is_punc(n)
-    if current then
-        if next and prev then
-            return "all_three"
-        elseif next then
-            return "with_next"
-        elseif prev then
-            return "with_prev"
-        else
-            return "only_me"
-        end
-    else
-        return false
-    end
+    return nil --n顶头
 end
 
 -- 处理每个标点前后的kern
-local function process_punc (head, n, punc_flag)
+local function process_punc (head, n)
     
     -- 取得结点字体的描述（未缩放的原始字模信息）
     local char = n.char
@@ -215,9 +275,9 @@ local function process_punc (head, n, punc_flag)
     -- 空铅
     puncs_font[font]["quad"] = puncs_font[font]["quad"] or fontdata[font].parameters.quad -- 用结点宽度代替？？？
     local quad = puncs_font[font]["quad"]
-    
+
     puncs_font[font][char] = puncs_font[font][char] or {}
-    if  #puncs_font[font][char] >0 then
+    if  #puncs_font[font][char] >0 then -- 从表中取用
         l_kern =  puncs_font[font][char][1]
         r_kern =  puncs_font[font][char][2]
         one_side_space = puncs_font[font][char][3]
@@ -262,75 +322,112 @@ local function process_punc (head, n, punc_flag)
         one_side_space = (two_space/2) / desc_width * quad
         puncs_font[font][char][3] = one_side_space
     end
-    
-    
-    local left_kern, right_kern = 0.0, 0.0
-    if punc_flag == "only_me" then
-        left_kern = 0 --c-pc
-        right_kern = 0 --cp-c
-    elseif punc_flag == "with_next" then
-        left_kern = 0 --c-ppc
-        right_kern = r_kern --cp-pc
-    elseif punc_flag == "with_prev" then
-        left_kern = l_kern --c-ppc
-        right_kern = 0 --cp-pc
-    elseif punc_flag == "all_three" then
-        left_kern = l_kern --c-ppc
-        right_kern =r_kern --cp-pc
-    end
 
-    -- 插入kern
-    local k
-    head,k = node_insertbefore (head, n, nodes_pool_kern (left_kern))
-    head,k = node_insertafter (head, n, nodes_pool_kern (right_kern))
 
-    -- 更改系统插入右标点后、所有标点前的半字收缩胶 TODO 可以更改系统常量吗？？？
-    if punc_flag == "with_next" or punc_flag == "all_three" then
-        local g = k.next
-        while g do
-            if g.id == glyph_id then
-                break
-            elseif g.id == glue_id and g.shrink then
-                g.shrink = one_side_space
-                break
+    local prev = prev_punc(n)
+    local next = next_punc(n)
+
+    -- 加空
+    if model == quanjiao or model == kaiming then
+        
+        local space_table = inserting_space[model]
+        
+        -- 后加空
+        local next_space
+        local next_space_table = space_table[puncs[n.char]]
+        if next_space_table then
+            if next then -- 后面是标点
+                next_space = next_space_table[puncs[next.char]]
+            elseif next == false then -- 是非标点可见结点（不是末尾nil）
+                next_space = next_space_table[puncs_no]
             end
-            g = g.next
+            if next_space then
+                local space = node_new(glue_id)
+                space.width = next_space * quad * space_factor
+                head,_ = node_insertafter (head, n, space)
+            end
+        end
+        
+        -- 全角(前面无标点、不是行头时)前加空
+        if model == quanjiao then
+            local pre_space
+            if prev == false then
+                pre_space = space_table[puncs_no][puncs[n.char]]
+            end
+            if pre_space then
+                local space = node_new(glue_id)
+                space.width = pre_space * quad * space_factor
+                head,_ = node_insertbefore (head, n, space)
+            end
         end
     end
+
+    -- 尽可能调整为半字标点
+    if model ~= yuanyang then
+        -- 插入kern
+        local k
+        head,k = node_insertbefore (head, n, nodes_pool_kern (l_kern))
+        head,k = node_insertafter (head, n, nodes_pool_kern (r_kern))
+
+        -- 更改系统插入右标点后、所有标点前的半字收缩胶 TODO 或更改scrp-cjk.lua
+        if next or prev then
+            local g = k.next
+            while g do
+                if g.id == glyph_id then
+                    break
+                elseif g.id == glue_id and g.shrink then
+                    g.shrink = one_side_space
+                    break
+                end
+                g = g.next
+            end
+        end
+    end
+
+    if model == hangjian then
+        -- TODO 同组标点整体提升、对齐
+        local l = node_new("hlist")
+        local w = n.width
+        l.width = 0
+        l.list =  node_copy(n) --复制结点到新建的结点列表\hbox下
+        -- 替换原结点
+        head, l = node_insertafter(head, n, l)
+        head, l = node_remove(head, n) -- 删除销毁结点会出错
+
+    end
+
+    return head
+
 end
 
 -- 迭代段落结点列表，处理标点组
 local function compress_punc (head)
     for n in node_traverse(head) do
-        -- if is_punc(n) then
-            local n_flag = is_zhcnpunc_node_group (n)
-            -- 至少本结点是标点
-            if n_flag then
-                process_punc (head, n, n_flag)
-            end
-        -- end
+        if is_punc(n) then
+            head = process_punc (head, n)
+        end
     end
+    return head
 end
 
 
-
 -- 包装回调任务：分行前的过滤器
-function Moduledata.zhspuncs.my_linebreak_filter (head)
-    compress_punc (head)
+function Moduledata.zhpunc.my_linebreak_filter (head)
+    head = compress_punc (head)
     return head, true
 end
 
 -- 分行后处理对齐
-function Moduledata.zhspuncs.align_left_puncs(head)
+function Moduledata.zhpunc.align_left_puncs(head)
     local it = head
     while it do
-        if it.id == hlist then
+        if it.id == hlist_id then
             local e = it.head
             local neg_kern = nil
             local hit = nil
             while e do
                 if is_punc(e) then
-                    if is_left_punc(e) then
+                    if is_left_sign(e) then
                         hit = e
                     end
                     break
@@ -340,7 +437,6 @@ function Moduledata.zhspuncs.align_left_puncs(head)
             if hit ~= nil then
                 -- 文本行整体向左偏移
                     -- local quad = quaddata[font]
-    
                 neg_kern = -puncs_font[hit.font][hit.char][3] --ah21
                 -- neg_kern = -left_puncs[hit.char] * fontdata[hit.font].parameters.quad --ah21
                 node_insertbefore(head, hit, nodes_pool_kern(neg_kern))
@@ -376,11 +472,11 @@ function Moduledata.zhspuncs.align_left_puncs(head)
 end
 
 -- 挂载任务
-function Moduledata.zhspuncs.opt ()
+function Moduledata.zhpunc.opt ()
     -- 段落分行前回调（最后调用）
-    nodes_tasks_appendaction("processors","after","Moduledata.zhspuncs.my_linebreak_filter")
+    nodes_tasks_appendaction("processors","after","Moduledata.zhpunc.my_linebreak_filter")
     -- 段落分行后回调（最后调用）
-    nodes_tasks_appendaction("finalizers", "after", "Moduledata.zhspuncs.align_left_puncs")
+    nodes_tasks_appendaction("finalizers", "after", "Moduledata.zhpunc.align_left_puncs")
 end
 
 
@@ -452,6 +548,6 @@ local function update_protrusions()
 end
 update_protrusions() --更新标点悬挂数据
 
-return Moduledata.zhspuncs
+return Moduledata.zhpunc
 
 

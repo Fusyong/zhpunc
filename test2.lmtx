@@ -1,0 +1,90 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 演示：
+%% 在processors类回调中干预断行；
+%% tex.linebreak()的用法；
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \setuppapersize[A4,landscape]
+\setuppapersize[A4]
+
+% 中文配置
+\mainlanguage[cn]
+\language[cn]
+\setscript[hanzi] % 汉字脚本（断行）
+\setupalign[hanging,hz] %行末标点悬挂
+
+% 汉字字体配置
+\usetypescriptfile[mscore]
+% \usebodyfont   [mschinese,20pt]
+\usebodyfont   [mschinese-light,20pt]
+% \setupbodyfont [mschinese-literate,20pt]
+% \usebodyfont   [mschinese-literate,20pt]
+% \definebodyfontenvironment[24pt]
+% \definebodyfontenvironment[18pt]
+% 定义字体
+% \definefont[kaiti][name:kaiti*default at 24pt]
+
+% 行距设置
+\setupinterlinespace[line=1.6em]
+% 缩进设置
+\setupindenting[yes, 2em, first]
+\setuphead[indentnext=yes] %标题后段落缩进，默认是no
+
+
+%%%%%%%%%%%%% 回调模块 %%%%%%%%%%%%%
+\startluacode
+
+---[[
+-- 使用本地中文标点压缩模块
+local zhpunc = require("./t-zhpunc.lua")
+zhpunc.opt() --moduledata.zhpunc.opt()
+--]]
+
+--[[ 使用直排模块
+local vertical_typeset = require("../vertical-typesetting/vertical_typeset.lua")
+vertical_typeset.opt()--moduledata.vertical_typese.opt()
+--]]
+
+--[[
+local jiazhu
+--jiazhu = require("jiazhu_parshape.lua")
+jiazhu = require("../jiazhu/jiazhu.lua")
+jiazhu.register()
+--]]
+
+\stopluacode
+
+% 标点宽度测试
+\def\test[#1][#2]{%
+    {\showglyphs\showboxes%
+    \inframed[width=#1,align=flushleft,offset=0em]{\hbox{#2}}%
+    }%
+}
+
+%%%%% 显式视觉调试信息 %%%%
+% \showboxes
+\showframe
+\showglyphs
+% \showmakeup
+% \tracingnodes1 %1,2
+\replacemissingcharacters
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\starttext
+
+% \noindent。？！．
+% ，、；：
+% ”’）］〕】》〉」』〗｝
+% “‘（［〔【《〈「『〖｛
+% ……
+% ——
+% —～
+% -·/／
+
+% \noindent 《〈
+
+\noindent 我《《
+
+% \test[2em][《〈]
+
+\stoptext
