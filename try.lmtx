@@ -72,19 +72,9 @@ jiazhu.register()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \starttext
 
-% \noindent。？！．
-% ，、；：
-% ”’）］〕】》〉」』〗｝
-% “‘（［〔【《〈「『〖｛
-% ……
-% ——
-% —～
-% -·/／
 
-% \noindent 《〈
 
-\noindent 我《《
+我。我，我
 
-% \test[2em][《〈]
 
 \stoptext

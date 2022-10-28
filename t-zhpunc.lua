@@ -13,15 +13,17 @@ Moduledata.zhpunc.model = Moduledata.zhpunc.model or quanjiao
 -- 
 -- 临时设置 TODO 用户接口
 -- 
+-- Moduledata.zhpunc.model = hangjian -- TODO
 Moduledata.zhpunc.model = yuanyang
-Moduledata.zhpunc.model = kaiming
 Moduledata.zhpunc.model = banjiao
 Moduledata.zhpunc.model = quanjiao
--- Moduledata.zhpunc.model = hangjian -- TODO
+Moduledata.zhpunc.model = kaiming
 local model = Moduledata.zhpunc.model
 
--- 加空调整比例配置（默认百分百）
-local space_factor = Moduledata.zhpunc.space_factor or 1
+-- 一个加空的宽度（默认0.5角）
+Moduledata.zhpunc.space_factor = Moduledata.zhpunc.space_factor or 0.5
+-- Moduledata.zhpunc.space_factor = 0.2
+local space_factor = Moduledata.zhpunc.space_factor
 
 local hlist_id   = nodes.nodecodes.hlist
 local vlist_id   = nodes.nodecodes.vlist
@@ -91,22 +93,22 @@ local puncs_half_junction = 'puncs_half_junction' -- 半角连接号，如-
 -- 非
 local puncs_no            = 'puncs_no'          -- 非标点的可视结点
 
--- 加空配置
+-- 加空配置的数量
 local inserting_space = {
     -- 开明
     [kaiming] = {
-        [puncs_ending_point] =   {puncs_left_sign = 0.5,  --。《
-                                  puncs_no        = 0.5}, --。囗
+        [puncs_ending_point] =   {puncs_left_sign = 1,  --。《
+                                  puncs_no        = 1}, --。囗
     },
     -- 全角
     [quanjiao] = {
-        [puncs_no]           =   {puncs_left_sign = 0.5}, --囗《
-        [puncs_right_sign]   =   {puncs_left_sign = 0.5,  --》《
-                                  puncs_no        = 0.5}, --》囗
-        [puncs_inner_point]  =   {puncs_left_sign = 0.5,  --、《
-                                  puncs_no        = 0.5}, --、囗
-        [puncs_ending_point] =   {puncs_left_sign = 0.5,  --。《
-                                  puncs_no        = 0.5}, --。囗
+        [puncs_no]           =   {puncs_left_sign = 1}, --囗《
+        [puncs_right_sign]   =   {puncs_left_sign = 1,  --》《
+                                  puncs_no        = 1}, --》囗
+        [puncs_inner_point]  =   {puncs_left_sign = 1,  --、《
+                                  puncs_no        = 1}, --、囗
+        [puncs_ending_point] =   {puncs_left_sign = 1,  --。《
+                                  puncs_no        = 1}, --。囗
     },
 }
 

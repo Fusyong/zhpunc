@@ -9,9 +9,9 @@ system          > files > jobname 'd:/ah21/TEX/zhpunc/test', input 'd:/ah21/TEX/
 fonts           > latin modern fonts are not preloaded
 languages       > language 'en' is active
 open source     > level 1, order 2, name 'd:/ah21/TEX/zhpunc/test.lmtx'
-fonts           > bodyfont '20pt' is defined (can better be done global)
-fonts           > bodyfont '24pt' is defined (can better be done global)
-fonts           > bodyfont '16pt' is defined (can better be done global)
+fonts           > bodyfont '10.5pt' is defined (can better be done global)
+fonts           > bodyfont '12.6pt' is defined (can better be done global)
+fonts           > bodyfont '8.4pt' is defined (can better be done global)
 open source     > level 2, order 3, name 'D:/venvs/context-win64/tex/texmf-context/tex/context/fonts/mkiv/type-imp-mscore.mkiv'
 close source    > level 2, order 3, name 'D:/venvs/context-win64/tex/texmf-context/tex/context/fonts/mkiv/type-imp-mscore.mkiv'
 open source     > level 2, order 4, name 'D:/venvs/context-win64/tex/texmf-context/tex/context/fonts/mkiv/type-imp-cambria.mkiv'
@@ -31,60 +31,88 @@ metapost        > trace > This is MPLIB for LuaMetaTeX, version 3.14, running in
 metapost        > trace > 
 metapost        > trace > loading metafun for lmtx, including the plain 1.004 base definitions
 metapost        > trace > 
-structure       > sectioning > chapter @ level 2 : 0.1 -> 中文标点模块zhpunc测试
-structure       > sectioning > section @ level 3 : 0.1.1 -> 标点字模的占位
+structure       > sectioning > title @ level 2 : 0.0 -> 测试
+structure       > sectioning > section @ level 3 : 0.0.1 -> 完整用例
 backend         > xmp > using file 'D:/venvs/context-win64/tex/texmf-context/tex/context/base/mkiv/lpdf-pdx.xml'
 pages           > flushing realpage 1, userpage 1, subpage 1
+structure       > sectioning > section @ level 3 : 0.0.2 -> 全部标点
 visualize       > enabled
-5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 91--91]
-5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 93--93]
-5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 95--95]
-structure       > sectioning > section @ level 3 : 0.1.2 -> 标点组与加空
-structure       > sectioning > subsection @ level 4 : 0.1.2.1 -> 全角配置
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 99--99]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 101--101]
 5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 103--103]
-5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 105--105]
-pages           > flushing realpage 2, userpage 2, subpage 2
-5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 107--107]
-5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 109--109]
-5:4: [package: overfull \hbox (0.8pt too wide) in paragraph at lines 111--111]
-5:4: [package: overfull \hbox (0.8pt too wide) in paragraph at lines 113--113]
-5:4: [package: overfull \hbox (0.79997pt too wide) in paragraph at lines 115--115]
+structure       > sectioning > section @ level 3 : 0.0.3 -> 标点组与加空
+structure       > sectioning > subsection @ level 4 : 0.0.3.1 -> 全角配置（quanjiao
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 116--116]
 5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 117--117]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 118--118]
 5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 119--119]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 120--120]
 5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 121--121]
-5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 123--123]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 122--122]
 5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 125--125]
-5:4: [package: overfull \hbox (0.79997pt too wide) in paragraph at lines 127--127]
-5:4: [package: overfull \hbox (0.79997pt too wide) in paragraph at lines 129--129]
-5:4: [package: overfull \hbox (0.79997pt too wide) in paragraph at lines 131--131]
-structure       > sectioning > subsection @ level 4 : 0.1.2.2 -> 开明配置
-pages           > flushing realpage 3, userpage 3, subpage 3
-5:4: [package: overfull \hbox (10.80212pt too wide) in paragraph at lines 135--135]
-5:4: [package: overfull \hbox (10.80212pt too wide) in paragraph at lines 137--137]
-5:4: [package: overfull \hbox (10.80212pt too wide) in paragraph at lines 139--139]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 127--127]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 129--129]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 131--131]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 133--133]
+pages           > flushing realpage 2, userpage 2, subpage 2
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 135--135]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 137--137]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 139--139]
 5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 141--141]
-5:4: [package: overfull \hbox (0.8pt too wide) in paragraph at lines 143--143]
-5:4: [package: overfull \hbox (0.8pt too wide) in paragraph at lines 145--145]
-5:4: [package: overfull \hbox (0.79997pt too wide) in paragraph at lines 147--147]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 143--143]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 145--145]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 147--147]
 5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 149--149]
 5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 151--151]
 5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 153--153]
-5:4: [package: overfull \hbox (10.80212pt too wide) in paragraph at lines 155--155]
-5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 157--157]
-5:4: [package: overfull \hbox (0.79997pt too wide) in paragraph at lines 159--159]
-5:4: [package: overfull \hbox (0.79997pt too wide) in paragraph at lines 161--161]
-5:4: [package: overfull \hbox (0.79997pt too wide) in paragraph at lines 163--163]
+structure       > sectioning > subsection @ level 4 : 0.0.3.2 -> 半角配置（banjiao）
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 162--162]
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 164--164]
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 166--166]
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 168--168]
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 170--170]
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 172--172]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 174--174]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 176--176]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 178--178]
+pages           > flushing realpage 3, userpage 3, subpage 3
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 180--180]
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 182--182]
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 184--184]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 186--186]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 188--188]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 190--190]
+structure       > sectioning > subsection @ level 4 : 0.0.3.3 -> 开明配置（kaiming）
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 196--196]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 196--196]
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 199--199]
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 201--201]
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 203--203]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 205--205]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 207--207]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 209--209]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 211--211]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 213--213]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 215--215]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 217--217]
+5:4: [package: overfull \hbox (6.04901pt too wide) in paragraph at lines 219--219]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 221--221]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 223--223]
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 225--225]
 pages           > flushing realpage 4, userpage 4, subpage 4
+5:4: [package: overfull \hbox (0.79999pt too wide) in paragraph at lines 227--227]
+structure       > sectioning > subsection @ level 4 : 0.0.3.4 -> 行间配置（hangjian）
+structure       > sectioning > subsection @ level 4 : 0.0.3.5 -> 原样配置（yuanyang）
 pages           > flushing realpage 5, userpage 5, subpage 5
 close source    > level 1, order 6, name 'd:/ah21/TEX/zhpunc/test.lmtx'
 system          > start used files
 system          > text: test
 system          > stop used files
 system          > start used files
-system          >    1: filename=publ-imp-default.lua filetype=lua foundname=D:/venvs/context-win64/tex/texmf-context/tex/context/base/mkiv/publ-imp-default.lua fullname=D:/venvs/context-win64/tex/texmf-context/tex/context/base/mkiv/publ-imp-default.lua usedmethod=database
+system          >    1: filename=publ-imp-default.lua filetype=scripts foundname=D:/venvs/context-win64/tex/texmf-context/tex/context/base/mkiv/publ-imp-default.lua fullname=D:/venvs/context-win64/tex/texmf-context/tex/context/base/mkiv/publ-imp-default.lua usedmethod=database
 system          >    2: filename=cont-new.mkxl filetype=tex foundname=D:/venvs/context-win64/tex/texmf-context/tex/context/base/mkxl/cont-new.mkxl fullname=D:/venvs/context-win64/tex/texmf-context/tex/context/base/mkxl/cont-new.mkxl usedmethod=database
-system          >    3: filename=lang-exc.lua filetype=lua foundname=D:/venvs/context-win64/tex/texmf-context/tex/context/base/mkiv/lang-exc.lua fullname=D:/venvs/context-win64/tex/texmf-context/tex/context/base/mkiv/lang-exc.lua usedmethod=database
-system          >    4: filename=lang-us.lua filetype=lua foundname=D:/venvs/context-win64/tex/texmf-context/tex/context/patterns/mkiv/lang-us.lua fullname=D:/venvs/context-win64/tex/texmf-context/tex/context/patterns/mkiv/lang-us.lua usedmethod=database
+system          >    3: filename=lang-exc.lua filetype=scripts foundname=D:/venvs/context-win64/tex/texmf-context/tex/context/base/mkiv/lang-exc.lua fullname=D:/venvs/context-win64/tex/texmf-context/tex/context/base/mkiv/lang-exc.lua usedmethod=database
+system          >    4: filename=lang-us.lua filetype=scripts foundname=D:/venvs/context-win64/tex/texmf-context/tex/context/patterns/mkiv/lang-us.lua fullname=D:/venvs/context-win64/tex/texmf-context/tex/context/patterns/mkiv/lang-us.lua usedmethod=database
 system          >    5: filename=d:/ah21/TEX/zhpunc/test.lmtx format=tex foundname=d:/ah21/TEX/zhpunc/test.lmtx fullname=d:/ah21/TEX/zhpunc/test.lmtx usedmethod=direct
 system          >    6: filename=type-imp-mscore.mkiv filetype=tex foundname=D:/venvs/context-win64/tex/texmf-context/tex/context/fonts/mkiv/type-imp-mscore.mkiv fullname=D:/venvs/context-win64/tex/texmf-context/tex/context/fonts/mkiv/type-imp-mscore.mkiv usedmethod=database
 system          >    7: filename=type-imp-cambria.mkiv filetype=tex foundname=D:/venvs/context-win64/tex/texmf-context/tex/context/fonts/mkiv/type-imp-cambria.mkiv fullname=D:/venvs/context-win64/tex/texmf-context/tex/context/fonts/mkiv/type-imp-cambria.mkiv usedmethod=database
@@ -148,29 +176,29 @@ system          >   min     150000   10000000     150000     150000    2000000  
 system          >   set     500000   10000000     250000     250000   50000000   10000000   10000000     100000       2000      10000     100000     500000     100000        250        250        250
 system          >   stp     100000    1000000     100000     100000     500000     250000    1000000      10000        250       1000      10000      10000        250        250         50         25
 system          > 
-system          >   mem     150000     948951     150000               2000000    1000000    1000000      10000        500       1000      20000      10000   11900240        144       1200        320
-system          >   all    2400000     948951    2400000              18000000    8000000    1000000     320000      16000      72000      80000     160000   11900240        144      28800      10240
+system          >   mem     150000     949726     150000               2000000    1000000    1000000      10000        500       1000      20000      10000   11900204        144       1200        320
+system          >   all    2400000     949726    2400000              18000000    8000000    1000000     320000      16000      72000      80000     160000   11900204        144      28800      10240
 system          > 
 system          >   ini    2144001     884084          0      46833          0     513795                                                                                       0                      
-system          >   ptr      49228                  9756      49212                574093          0          0          0          0          0          0         10          0         28          7
-system          >   top      49229                740850     131074      52901     570934        405         39          7         12         42        451        250        250         50         10
+system          >   ptr      49228                  9680      49212                579068          0          0          0          0          0          0         10          0         28          7
+system          >   top      49229                740850     131074      90885     571700        405         39          7         12         42        451        250        250         50         10
 system          >   -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 system          > 
 system          >   current input type    : initial
 system          > 
-system          >   approximate memory    : 49741607 (47 MB)
+system          >   approximate memory    : 49742346 (47 MB)
 system          > 
-system          >   expansion depth       : min: 10000, max: 1000000, set: 10000, top: 8
+system          >   expansion depth       : min: 10000, max: 1000000, set: 10000, top: 9
 system          > 
 system          >   luabytecode registers : 1006
 system          >   luabytecode bytes     : 16112 (0 MB)
-system          >   luastate bytes now    : 147844331 (140 MB)
-system          >   luastate bytes max    : 147976474 (141 MB)
+system          >   luastate bytes now    : 149702553 (142 MB)
+system          >   luastate bytes max    : 149815797 (142 MB)
 system          > 
-system          >   file callbacks        : 782
-system          >   saved callbacks       : 1578
+system          >   file callbacks        : 857
+system          >   saved callbacks       : 2185
 system          >   direct callbacks      : 4
-system          >   function callbacks    : 1727
+system          >   function callbacks    : 1852
 system          >   value callbacks       : 6
 system          >   message callbacks     : 0
 system          >   bytecode callbacks    : 612
@@ -182,37 +210,37 @@ system          >   mp text callbacks     : 0
 system          >   mp script callbacks   : 382
 system          >   mp log callbacks      : 14
 system          > 
-system          >   total callbacks       : 4709
+system          >   total callbacks       : 5516
 system          >   mp total callbacks    : 13986
 system          >   backend callbacks     : 0
 system          > 
 mkiv lua stats  > used config file: selfautoparent:/texmf/web2c/texmfcnf.lua
 mkiv lua stats  > used cache path: D:/venvs/context-win64/tex/texmf-cache/luametatex-cache/context/5fe67e0bfe781ce0dde776fb1556f32e
-mkiv lua stats  > resource resolver: loadtime 0.007 seconds, 0 scans with scantime 0.000 seconds, 0 shared scans, 41 found files, scanned paths: <none>
-mkiv lua stats  > stored bytecode data: 506 modules (0.215 sec), 106 tables (0.019 sec), 612 chunks (0.234 sec)
+mkiv lua stats  > resource resolver: loadtime 0.006 seconds, 0 scans with scantime 0.000 seconds, 0 shared scans, 41 found files, scanned paths: <none>
+mkiv lua stats  > stored bytecode data: 506 modules (0.249 sec), 106 tables (0.019 sec), 612 chunks (0.268 sec)
 mkiv lua stats  > traced context: maxstack: 1651, freed: 0, unreachable: 1651
 mkiv lua stats  > cleaned up reserved nodes: 84 nodes, 8 lists of 434
-mkiv lua stats  > node memory usage: 208 attribute, 38 dir, 2 glue, 80 gluespec, 65 hlist, 3 kern, 647 mathspec, 5 penalty, 64 rule, 2 temp, 4 whatsit
-mkiv lua stats  > node list callback tasks: 13 unique task lists, 10 instances (re)created, 665 calls
-mkiv lua stats  > attribute processing time: 0.012 seconds front- and backend
-mkiv lua stats  > driver time: 0.056 seconds 
+mkiv lua stats  > node memory usage: 328 attribute, 62 dir, 2 glue, 80 gluespec, 143 hlist, 3 kern, 647 mathspec, 13 penalty, 140 rule, 2 temp, 4 whatsit
+mkiv lua stats  > node list callback tasks: 13 unique task lists, 10 instances (re)created, 982 calls
+mkiv lua stats  > attribute processing time: 0.015 seconds front- and backend
+mkiv lua stats  > driver time: 0.049 seconds 
 mkiv lua stats  > used backend: pdf
-mkiv lua stats  > jobdata time: 0.003 seconds saving, 0.002 seconds loading
-mkiv lua stats  > callbacks: file: 782, saved: 1578, direct: 4, function: 1727, value: 6, message: 0, bytecode: 612, late 0, total: 4709 (942 per page)
+mkiv lua stats  > jobdata time: 0.002 seconds saving, 0.001 seconds loading
+mkiv lua stats  > callbacks: file: 857, saved: 2185, direct: 4, function: 1852, value: 6, message: 0, bytecode: 612, late 0, total: 5516 (1103 per page)
 mkiv lua stats  > randomizer: resumed with value 0.77402901098547
 mkiv lua stats  > loaded tex modules: 1 requested, all found (*-s-layout-show)
 mkiv lua stats  > loaded patterns: cn::57 en::1, load time: 0.000
 mkiv lua stats  > loaded fonts: 4 files: cambria.ttc, stfangso.ttf, stkaiti.ttf, lmmonoltcond10-regular.otf
-mkiv lua stats  > font engine: otf 3.121, afm 1.513, tfm 1.000, 9 instances, 3 shared in backend, 1 common vectors, 2 common hashes, load time 0.591 seconds 
-mkiv lua stats  > body font sizes: defined: 10pt 11pt 12pt 14.4pt 17.3pt 20.7pt 4pt 5pt 6pt 7pt 8pt 9pt, undefined: 16pt 20pt 24pt
-mkiv lua stats  > visualization time: 0.004 seconds
-mkiv lua stats  > metapost: 0.001 seconds, loading: 0.132, execution: 0.001, n: 2, average: 0.067, instances: 1, luacalls: 13986 (file: 13590, text: 0, script: 382, log: 14), memory: 3.829 M
+mkiv lua stats  > font engine: otf 3.121, afm 1.513, tfm 1.000, 9 instances, 3 shared in backend, 1 common vectors, 2 common hashes, load time 0.524 seconds 
+mkiv lua stats  > body font sizes: defined: 10pt 11pt 12pt 14.4pt 17.3pt 20.7pt 4pt 5pt 6pt 7pt 8pt 9pt, undefined: 10.5pt 12.6pt 8.4pt
+mkiv lua stats  > visualization time: 0.006 seconds
+mkiv lua stats  > metapost: 0.001 seconds, loading: 0.038, execution: 0.001, n: 2, average: 0.020, instances: 1, luacalls: 13986 (file: 13590, text: 0, script: 382, log: 14), memory: 3.829 M
 mkiv lua stats  > page group warning: transparencies are used but no pagecolormodel is set
-mkiv lua stats  > font embedding time: 0.073 seconds, 3 fonts
+mkiv lua stats  > font embedding time: 0.054 seconds, 3 fonts
 mkiv lua stats  > result saved in file: d:/ah21/TEX/zhpunc/test.pdf, compresslevel 1, objectcompresslevel 3
 mkiv lua stats  > positions: 4 collected, 0 deltas, 0 shared partials, 0 partial entries
 mkiv lua stats  > used platform: win64, type: windows, binary subtree: texmf-win64
 mkiv lua stats  > used engine: luametatex version: 2.1001, functionality level: 20221014, format id: 674, compiler: gcc
 mkiv lua stats  > tex properties: 740850 hash slots used of 2097152, 49212 control sequences, approximate memory usage: 47 MB
-mkiv lua stats  > lua properties: engine: lua 5.4, used memory: 146 MB, ctx: 141 MB, max: 141 MB, symbol mask: utf (τεχ)
-mkiv lua stats  > runtime: 1.584 seconds, 5 processed pages, 5 shipped pages, 3.156 pages/second
+mkiv lua stats  > lua properties: engine: lua 5.4, used memory: 147 MB, ctx: 142 MB, max: 142 MB, symbol mask: utf (τεχ)
+mkiv lua stats  > runtime: 1.412 seconds, 5 processed pages, 5 shipped pages, 3.541 pages/second
