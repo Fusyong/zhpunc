@@ -1,11 +1,9 @@
 Moduledata = Moduledata or {}
 Moduledata.zhpunc = Moduledata.zhpunc or {}
 -- 配合直排
-Moduledata.vertical_typeset = Moduledata.vertical_typeset or {}
-Moduledata.vertical_typeset.appended = Moduledata.vertical_typeset.appended or false
-
 -- 直排模块（判断是否挂载直排，以便处理旋转的标点）
-Moduledata.vertical_typeset = Moduledata.vertical_typeset or {}
+Moduledata.vtypeset = Moduledata.vtypeset or {}
+Moduledata.vtypeset.appended = Moduledata.vtypeset.appended or false
 
 -- 标点模式配置，默认全角
 local quanjiao, kaiming, banjiao, yuanyang, hangjian = "quanjiao", "kaiming", "banjiao","yuanyang","hangjian"
@@ -178,7 +176,7 @@ local puncs_to_rotate = {
 local function is_punc(n)
     if n.id == glyph_id then
         -- 直排旋转标点
-        if Moduledata.vertical_typeset.appended and puncs_to_rotate[n.char] then
+        if Moduledata.vtypeset.appended and puncs_to_rotate[n.char] then
             return 2
         elseif puncs[n.char] then
             return 1
@@ -521,7 +519,7 @@ local function update_protrusions()
         [0xFF1A] = { 0, 0.65 },   -- ：
     }
     -- 直排时更新
-    if Moduledata.vertical_typeset.appended then
+    if Moduledata.vtypeset.appended then
         local puncs_to_rotated = {
             [0x3001] = {0, 0.65},   -- 、
             [0xFF0C] = {0, 0.5},   -- ，
