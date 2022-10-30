@@ -28,16 +28,20 @@
 \setuphead[indentnext=yes] %标题后段落缩进，默认是no
 
 
+
+% pattern: quanjiao(default), kaiming, banjiao, yuanyang, hangjian
+% spacequad: 0.5(default)
+\usemodule[zhpunc][pattern=kaiming, spacequad=0.5]
 %%%%%%%%%%%%% 回调模块 %%%%%%%%%%%%%
 \startluacode
 
----[[
+--[[
 -- 使用本地中文标点压缩模块
 local zhpunc = require("./t-zhpunc.lua")
 zhpunc.opt() --moduledata.zhpunc.opt()
 --]]
 
---[[ 使用直排模块
+---[[ 使用直排模块
 local vertical_typeset = require("../vertical-typesetting/vertical_typeset.lua")
 vertical_typeset.opt()--moduledata.vertical_typese.opt()
 --]]
@@ -50,6 +54,7 @@ jiazhu.register()
 --]]
 
 \stopluacode
+
 
 % 标点宽度测试
 \def\test[#1][#2]{%
@@ -237,5 +242,42 @@ TODO
 \subsection{原样配置（yuanyang）}
 
 不剪切标点（窄于半角时剪为半角），无加空情形。
+
+\subsection{竖排开明}
+
+\test[8em][囗囗”〉》。《〈“囗囗]
+
+\test[8em][囗囗”〉》．《〈“囗囗]
+
+\test[8em][囗囗”〉》！《〈“囗囗]
+
+\test[8em][囗囗”〉》？《〈“囗囗]
+
+\test[8em][囗囗”〉》；《〈“囗囗]
+
+\test[7.5em][囗囗”〉》：《〈“囗囗]
+
+\test[7.5em][囗囗”〉》、《〈“囗囗]
+
+\test[7.5em][囗囗”〉》，《〈“囗囗]
+
+
+\subsection{竖排全角}
+
+\test[8em][囗囗”〉》！《〈“囗囗]
+
+\test[8em][囗囗”〉》？《〈“囗囗]
+
+\test[8em][囗囗”〉》；《〈“囗囗]
+
+\test[8em][囗囗”〉》：《〈“囗囗]
+
+\test[8em][囗囗”〉》、《〈“囗囗]
+
+\test[8em][囗囗”〉》。《〈“囗囗]
+
+\test[8em][囗囗”〉》，《〈“囗囗]
+
+\test[8em][囗囗”〉》．《〈“囗囗]
 
 \stoptext

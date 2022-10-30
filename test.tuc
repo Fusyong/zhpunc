@@ -137,6 +137,22 @@ utilitydata.structures.sections.collected={
   ["separatorset"]="default",
   ["set"]="all",
  },
+ {
+  ["block"]="bodypart",
+  ["conversionset"]="default",
+  ["language"]="cn",
+  ["numbers"]=9,
+  ["separatorset"]="default",
+  ["set"]="all",
+ },
+ {
+  ["block"]="bodypart",
+  ["conversionset"]="default",
+  ["language"]="cn",
+  ["numbers"]=10,
+  ["separatorset"]="default",
+  ["set"]="all",
+ },
 }
 
 if not utilitydata.structures then utilitydata.structures = { } end
@@ -180,10 +196,10 @@ utilitydata.structures.counters.collected={
   { 0, 0 },
  },
  ["realpage"]={
-  { 5 },
+  { 6 },
  },
  ["subpage"]={
-  { 5 },
+  { 6 },
  },
  ["table"]={
   { 0, 0 },
@@ -192,7 +208,7 @@ utilitydata.structures.counters.collected={
   { 0 },
  },
  ["userpage"]={
-  { 5 },
+  { 6 },
  },
 }
 
@@ -201,8 +217,8 @@ if not utilitydata.structures.lists then utilitydata.structures.lists = { } end
 
 utilitydata.structures.lists.collected={
  {
-  ["metadata"]=9,
-  ["numberdata"]=11,
+  ["metadata"]=11,
+  ["numberdata"]=13,
   ["references"]={
    ["internal"]=1,
    ["realpage"]=1,
@@ -214,8 +230,8 @@ utilitydata.structures.lists.collected={
   },
  },
  {
-  ["metadata"]=12,
-  ["numberdata"]=13,
+  ["metadata"]=14,
+  ["numberdata"]=15,
   ["references"]={
    ["block"]="bodypart",
    ["internal"]=2,
@@ -228,8 +244,8 @@ utilitydata.structures.lists.collected={
   },
  },
  {
-  ["metadata"]=12,
-  ["numberdata"]=14,
+  ["metadata"]=14,
+  ["numberdata"]=16,
   ["references"]={
    ["block"]="bodypart",
    ["internal"]=3,
@@ -242,8 +258,8 @@ utilitydata.structures.lists.collected={
   },
  },
  {
-  ["metadata"]=12,
-  ["numberdata"]=15,
+  ["metadata"]=14,
+  ["numberdata"]=17,
   ["references"]={
    ["block"]="bodypart",
    ["internal"]=4,
@@ -256,8 +272,8 @@ utilitydata.structures.lists.collected={
   },
  },
  {
-  ["metadata"]=16,
-  ["numberdata"]=17,
+  ["metadata"]=18,
+  ["numberdata"]=19,
   ["references"]={
    ["block"]="bodypart",
    ["internal"]=5,
@@ -270,8 +286,8 @@ utilitydata.structures.lists.collected={
   },
  },
  {
-  ["metadata"]=16,
-  ["numberdata"]=18,
+  ["metadata"]=18,
+  ["numberdata"]=20,
   ["references"]={
    ["block"]="bodypart",
    ["internal"]=6,
@@ -284,8 +300,8 @@ utilitydata.structures.lists.collected={
   },
  },
  {
-  ["metadata"]=16,
-  ["numberdata"]=19,
+  ["metadata"]=18,
+  ["numberdata"]=21,
   ["references"]={
    ["block"]="bodypart",
    ["internal"]=7,
@@ -298,8 +314,8 @@ utilitydata.structures.lists.collected={
   },
  },
  {
-  ["metadata"]=16,
-  ["numberdata"]=20,
+  ["metadata"]=18,
+  ["numberdata"]=22,
   ["references"]={
    ["block"]="bodypart",
    ["internal"]=8,
@@ -312,8 +328,8 @@ utilitydata.structures.lists.collected={
   },
  },
  {
-  ["metadata"]=16,
-  ["numberdata"]=21,
+  ["metadata"]=18,
+  ["numberdata"]=23,
   ["references"]={
    ["block"]="bodypart",
    ["internal"]=9,
@@ -325,6 +341,34 @@ utilitydata.structures.lists.collected={
    ["title"]="原样配置（yuanyang）",
   },
  },
+ {
+  ["metadata"]=18,
+  ["numberdata"]=24,
+  ["references"]={
+   ["block"]="bodypart",
+   ["internal"]=10,
+   ["realpage"]=5,
+   ["section"]=9,
+  },
+  ["titledata"]={
+   ["label"]="subsection",
+   ["title"]="竖排开明",
+  },
+ },
+ {
+  ["metadata"]=18,
+  ["numberdata"]=25,
+  ["references"]={
+   ["block"]="bodypart",
+   ["internal"]=11,
+   ["realpage"]=5,
+   ["section"]=10,
+  },
+  ["titledata"]={
+   ["label"]="subsection",
+   ["title"]="竖排全角",
+  },
+ },
 }
 
 if not utilitydata.structures then utilitydata.structures = { } end
@@ -334,36 +378,43 @@ utilitydata.structures.pages.collected={
  {
   ["block"]="bodypart",
   ["number"]=1,
-  ["numberdata"]=22,
-  ["prefixdata"]=23,
+  ["numberdata"]=26,
+  ["prefixdata"]=27,
   ["state"]="start",
  },
  {
   ["block"]="bodypart",
   ["number"]=2,
-  ["numberdata"]=22,
-  ["prefixdata"]=23,
+  ["numberdata"]=26,
+  ["prefixdata"]=27,
   ["state"]="start",
  },
  {
   ["block"]="bodypart",
   ["number"]=3,
-  ["numberdata"]=22,
-  ["prefixdata"]=23,
+  ["numberdata"]=26,
+  ["prefixdata"]=27,
   ["state"]="start",
  },
  {
   ["block"]="bodypart",
   ["number"]=4,
-  ["numberdata"]=22,
-  ["prefixdata"]=23,
+  ["numberdata"]=26,
+  ["prefixdata"]=27,
   ["state"]="start",
  },
  {
   ["block"]="bodypart",
   ["number"]=5,
-  ["numberdata"]=22,
-  ["prefixdata"]=23,
+  ["numberdata"]=26,
+  ["prefixdata"]=27,
+  ["state"]="start",
+ },
+ {
+  ["block"]="bodypart",
+  ["number"]=6,
+  ["numberdata"]=26,
+  ["prefixdata"]=27,
   ["state"]="start",
  },
 }
@@ -443,6 +494,8 @@ utilitydata.job.packed={
   { 0, 0, 3, 3 },
   { 0, 0, 3, 4 },
   { 0, 0, 3, 5 },
+  { 0, 0, 3, 6 },
+  { 0, 0, 3, 7 },
   {
    ["catcodes"]=9,
    ["coding"]="tex",
@@ -457,7 +510,7 @@ utilitydata.job.packed={
    ["conversionset"]="default",
    ["hidenumber"]=true,
    ["language"]="cn",
-   ["numbers"]=10,
+   ["numbers"]=12,
    ["separatorset"]="default",
    ["set"]="all",
   },
@@ -538,6 +591,22 @@ utilitydata.job.packed={
    ["conversionset"]="default",
    ["language"]="cn",
    ["numbers"]=8,
+   ["separatorset"]="default",
+   ["set"]="all",
+  },
+  {
+   ["block"]="bodypart",
+   ["conversionset"]="default",
+   ["language"]="cn",
+   ["numbers"]=9,
+   ["separatorset"]="default",
+   ["set"]="all",
+  },
+  {
+   ["block"]="bodypart",
+   ["conversionset"]="default",
+   ["language"]="cn",
+   ["numbers"]=10,
    ["separatorset"]="default",
    ["set"]="all",
   },

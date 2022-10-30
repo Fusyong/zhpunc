@@ -97,10 +97,13 @@
 \definefont[tidebars][name:stsong*default at 0.683\jiazhsize]
 \definebar[shumhs][text=\lower\exheight\hbox{\tidebars\rotate[rotation=-9]{\kern-0.16em～\kern-0.16em}}, repeat=yes, continue=no, offset=-0.25]
 
+% pattern: quanjiao(default), kaiming, banjiao, yuanyang, hangjian
+% spacequad: 0.5(default)
+\usemodule[zhpunc][pattern=kaiming, spacequad=0.5]
 %%%%%%%%%%%%% 回调模块 %%%%%%%%%%%%%
 \startluacode
 
----[[
+--[[
 -- 使用本地中文标点压缩模块
 local zhpunc = require("./t-zhpunc.lua")
 zhpunc.model = "quanjiao" -- kaiming quanjiao banjiao yuanyang hangjian

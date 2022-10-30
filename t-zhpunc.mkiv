@@ -1,0 +1,37 @@
+%D \module
+%D   [     file=t-zhpunc,
+%D      version=2022-10-29,
+%D        title=zhpunc,
+%D     subtitle=Chinese punctuation suport,
+%D       author=黄复雄(Huang Fusyong),
+%D         date=2022-10-29,
+%D    copyright=黄复雄(Huang Fusyong),
+%D      license=GNU GPL 2.0,
+%D          url=https://github.com/Fusyong/zhpunc]
+\startmodule[zhpunc]
+\unprotect
+
+% 设置模块
+% pattern: quanjiao, kaiming, banjiao, yuanyang, hangjian
+\setupmodule[pattern=quanjiao, spacequad=0.5]
+
+% 导入lua
+\ctxlua{require("./t-zhpunc.lua")}
+
+% 传参设置命令
+% local named_values = utilities.parsers.settings_to_hash(keyvals)
+\def\zhpuncset[#1][#2]{%
+    \ctxlua{Moduledata.zhpunc.set([==[#1]==], [==[#2]==])}%
+}
+% \currentmoduleparameter{pattern}
+% \moduleparameter{zhpunc}{pattern}
+\zhpuncset[\currentmoduleparameter{pattern}][\currentmoduleparameter{spacequad}]
+
+% 在指定位置（\everystarttext）插入/应用命令
+\def\zhpuncappend{%
+    \ctxlua{Moduledata.zhpunc.append()}%
+}\appendtoks \zhpuncappend \to \everystarttext
+
+\protect
+\stopmodule
+\endinput

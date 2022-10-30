@@ -9,21 +9,6 @@ Moduledata.vertical_typeset = Moduledata.vertical_typeset or {}
 
 -- 标点模式配置，默认全角
 local quanjiao, kaiming, banjiao, yuanyang, hangjian = "quanjiao", "kaiming", "banjiao","yuanyang","hangjian"
-Moduledata.zhpunc.model = Moduledata.zhpunc.model or quanjiao
--- 
--- 临时设置 TODO 用户接口
--- 
--- Moduledata.zhpunc.model = hangjian -- TODO
-Moduledata.zhpunc.model = yuanyang
-Moduledata.zhpunc.model = banjiao
-Moduledata.zhpunc.model = quanjiao
-Moduledata.zhpunc.model = kaiming
-local model = Moduledata.zhpunc.model
-
--- 一个加空的宽度（默认0.5角）
-Moduledata.zhpunc.space_factor = Moduledata.zhpunc.space_factor or 0.5
--- Moduledata.zhpunc.space_factor = 0.2
-local space_factor = Moduledata.zhpunc.space_factor
 
 local hlist_id   = nodes.nodecodes.hlist
 local vlist_id   = nodes.nodecodes.vlist
@@ -70,7 +55,7 @@ end
 -- 标点缓存数据
 -- {
 --     font={
---         [0x2018]={kern_l, kern_r, s_l}, -- 左kern、右kern、左空（左对齐启用）
+--         [0x2018]={kern_l, kern_r, one_side_space, final_quad}, -- 左kern、右kern、单侧空（左右对齐用）、最终应用宽度（角，用于判断是否加空）
 --         ...
 --     },
 --     ...
@@ -93,7 +78,7 @@ local puncs_half_junction = 'puncs_half_junction' -- 半角连接号，如-
 -- 非
 local puncs_no            = 'puncs_no'          -- 非标点的可视结点
 
--- 加空配置的数量
+-- 加空的组合与数量
 local inserting_space = {
     -- 开明
     [kaiming] = {
@@ -272,6 +257,8 @@ local function process_punc (head, n)
     local r_kern
     -- 单侧空白（两侧相同）
     local one_side_space
+    -- 最终应用宽度
+    local final_quad
 
     puncs_font[font] = puncs_font[font] or {}
     -- 空铅
@@ -283,6 +270,7 @@ local function process_punc (head, n)
         l_kern =  puncs_font[font][char][1]
         r_kern =  puncs_font[font][char][2]
         one_side_space = puncs_font[font][char][3]
+        final_quad = puncs_font[font][char][4]
     else -- 计算并缓存
         local desc = fontdata[font].descriptions[char]
         local desc_width = desc.width
@@ -310,9 +298,11 @@ local function process_punc (head, n)
         if w_in < (desc_width / 2) then
             -- 半角标点，半字宽
             two_space = (desc_width / 2) - w_in
+            final_quad = 0.5
         else
             -- 全角标点，整字宽
             two_space = desc_width - w_in
+            final_quad = 1
         end
         -- 再居中
         l_kern = (two_space/2 - left_space) / desc_width * quad  --左kern比例
@@ -323,16 +313,21 @@ local function process_punc (head, n)
         -- 左、右侧空白（供对齐行头、右侧收缩用）  TODO
         one_side_space = (two_space/2) / desc_width * quad
         puncs_font[font][char][3] = one_side_space
+
+        -- 实际字宽（角）
+        puncs_font[font][char][4] = final_quad
     end
 
 
     local prev = prev_punc(n)
     local next = next_punc(n)
 
-    -- 加空
-    if model == quanjiao or model == kaiming then
+    -- 实际占位半角的标点可能加空
+    if  final_quad == 0.5
+        and (Moduledata.zhpunc.model == quanjiao or  Moduledata.zhpunc.model == kaiming)
+            then
         
-        local space_table = inserting_space[model]
+        local space_table = inserting_space[ Moduledata.zhpunc.model]
         
         -- 后加空
         local next_space
@@ -345,27 +340,27 @@ local function process_punc (head, n)
             end
             if next_space then
                 local space = node_new(glue_id)
-                space.width = next_space * quad * space_factor
+                space.width = next_space * quad * Moduledata.zhpunc.space_quad
                 head,_ = node_insertafter (head, n, space)
             end
         end
         
         -- 全角(前面无标点、不是行头时)前加空
-        if model == quanjiao then
+        if  Moduledata.zhpunc.model == quanjiao then
             local pre_space
             if prev == false then
                 pre_space = space_table[puncs_no][puncs[n.char]]
             end
             if pre_space then
                 local space = node_new(glue_id)
-                space.width = pre_space * quad * space_factor
+                space.width = pre_space * quad * Moduledata.zhpunc.space_quad
                 head,_ = node_insertbefore (head, n, space)
             end
         end
     end
 
     -- 尽可能调整为半字标点
-    if model ~= yuanyang then
+    if  Moduledata.zhpunc.model ~= yuanyang then
         -- 插入kern
         local k
         head,k = node_insertbefore (head, n, nodes_pool_kern (l_kern))
@@ -386,7 +381,7 @@ local function process_punc (head, n)
         end
     end
 
-    if model == hangjian then
+    if  Moduledata.zhpunc.model == hangjian then
         -- TODO 同组标点整体提升、对齐
         local l = node_new("hlist")
         local w = n.width
@@ -473,8 +468,14 @@ function Moduledata.zhpunc.align_left_puncs(head)
     return head, done
 end
 
--- 挂载任务
-function Moduledata.zhpunc.opt ()
+-- 传参设置
+function Moduledata.zhpunc.set(pattern, spacequad)
+    Moduledata.zhpunc.model = pattern or quanjiao
+    Moduledata.zhpunc.space_quad = spacequad or 0.5
+end
+
+-- 挂载/启动任务
+function Moduledata.zhpunc.append()
     -- 段落分行前回调（最后调用）
     nodes_tasks_appendaction("processors","after","Moduledata.zhpunc.my_linebreak_filter")
     -- 段落分行后回调（最后调用）
