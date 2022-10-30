@@ -3,8 +3,7 @@
 %% 在processors类回调中干预断行；
 %% tex.linebreak()的用法；
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \setuppapersize[A4,landscape]
-\setuppapersize[A4]
+\setuppapersize[A4,landscape]
 
 % 中文配置
 \mainlanguage[cn]
@@ -97,29 +96,30 @@
 \definefont[tidebars][name:stsong*default at 0.683\jiazhsize]
 \definebar[shumhs][text=\lower\exheight\hbox{\tidebars\rotate[rotation=-9]{\kern-0.16em～\kern-0.16em}}, repeat=yes, continue=no, offset=-0.25]
 
+%%%%%%%%%%%%% 通过入口文件使用 %%%%%%%%%%%%%
 % pattern: quanjiao(default), kaiming, banjiao, yuanyang, hangjian
 % spacequad: 0.5(default)
+
 \usemodule[zhpunc][pattern=kaiming, spacequad=0.5]
-%%%%%%%%%%%%% 回调模块 %%%%%%%%%%%%%
+
+%%%%%%%%%%%%% 直接使用lua模块 %%%%%%%%%%%%%
 \startluacode
 
---[[
--- 使用本地中文标点压缩模块
-local zhpunc = require("./t-zhpunc.lua")
-zhpunc.model = "quanjiao" -- kaiming quanjiao banjiao yuanyang hangjian
-zhpunc.opt() --moduledata.zhpunc.opt()
+--[[ 使用本地中文标点压缩模块
+    local zhpunc = require("./t-zhpunc.lua")
+    zhpunc.set("kaiming", "0.5") --设置
+    zhpunc.append() --挂载
 --]]
 
----[[ 使用直排模块
-local vertical_typeset = require("../vertical-typesetting/vertical_typeset.lua")
-vertical_typeset.opt()--moduledata.vertical_typese.opt()
+---[[ 配合使用本地直排模块
+    local vertical_typeset = require("../vertical-typesetting/vertical_typeset.lua")
+    vertical_typeset.opt()--moduledata.vertical_typese.opt()
 --]]
 
----[[
-local jiazhu
---jiazhu = require("jiazhu_parshape.lua")
-jiazhu = require("../jiazhu/jiazhu.lua")
-jiazhu.register()
+---[[配合使用本地夹注模块
+    local jiazhu
+    jiazhu = require("../jiazhu/jiazhu.lua")
+    jiazhu.register()
 --]]
 
 \stopluacode

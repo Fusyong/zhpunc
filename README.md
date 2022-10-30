@@ -3,6 +3,43 @@ ConTeXt中文标点支持插件。
 
 zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构，而二者都基于[liyanrui/zhfonts项目](https://github.com/liyanrui/zhfonts)，谨致谢忱。
 
+## 安装和使用方法
+
+* 两种安装方法：
+    * 按[ConTeXt官方指南](https://wiki.contextgarden.net/Modules)安装模块文件：`t-zhpunc.mkiv`（入口）和`t-zhpunc.lua`，然后使用`context --generate`命令更新文件索引
+    * 或将上述文件直接放在排版脚本所在的目录
+* 两种使用方法，在排版脚本前言中设置如下：
+
+```latex
+%%%%%%%%%%%%% 通过入口文件使用 %%%%%%%%%%%%%
+% pattern: quanjiao(default), kaiming, banjiao, yuanyang, hangjian
+% spacequad: 0.5(default)
+
+\usemodule[zhpunc][pattern=kaiming, spacequad=0.5]
+
+%%%%%%%%%%%%% 直接使用lua模块 %%%%%%%%%%%%%
+\startluacode
+
+--[[ 使用本地中文标点压缩模块
+    local zhpunc = require("./t-zhpunc.lua")
+    zhpunc.set("kaiming", "0.5") --设置
+    zhpunc.append() --挂载
+--]]
+
+--[[ 配合使用本地直排模块
+    local vertical_typeset = require("../vertical-typesetting/vertical_typeset.lua")
+    vertical_typeset.opt()--moduledata.vertical_typese.opt()
+--]]
+
+--[[配合使用本地夹注模块
+    local jiazhu
+    jiazhu = require("../jiazhu/jiazhu.lua")
+    jiazhu.register()
+--]]
+
+\stopluacode
+```
+
 ## TODO & bugs
 
 1. [ ] 全部缓存、使用实测的标点字模数据，而不是使用预设的比例，以适应不同字体的实际；
