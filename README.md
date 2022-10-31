@@ -6,9 +6,9 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
 ## 安装和使用方法
 
 * 两种安装方法：
-    * 按[ConTeXt官方指南](https://wiki.contextgarden.net/Modules)安装模块文件：`t-zhpunc.mkiv`（入口）和`t-zhpunc.lua`，然后使用`context --generate`命令更新文件索引
-    * 或将上述文件直接放在排版脚本所在的目录
-* 两种使用方法，在排版脚本前言中设置如下：
+    1. 按[ConTeXt官方指南](https://wiki.contextgarden.net/Modules)安装模块文件：`t-zhpunc.mkiv`（入口）和`t-zhpunc.lua`，然后使用`context --generate`命令更新文件索引
+    1. 将上述文件直接放在编译时的当前路径（通常即排版脚本所在的目录，在vscode环境中即项目根目录）；直接使用lua模块时不限定存放位置，但需要自行确保导入位置正确
+* 两种使用方法，在排版脚本前言中分别设置如下：
 
 ```latex
 %%%%%%%%%%%%% 通过入口文件使用 %%%%%%%%%%%%%
@@ -16,27 +16,16 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
 % spacequad: 0.5(default)
 
 \usemodule[zhpunc][pattern=kaiming, spacequad=0.5]
+```
 
+```lua
 %%%%%%%%%%%%% 直接使用lua模块 %%%%%%%%%%%%%
 \startluacode
-
---[[ 使用本地中文标点压缩模块
+---[[
     local zhpunc = require("./t-zhpunc.lua")
     zhpunc.set("kaiming", "0.5") --设置
     zhpunc.append() --挂载
 --]]
-
---[[ 配合使用本地直排模块
-    local vertical_typeset = require("../vertical-typesetting/vertical_typeset.lua")
-    vertical_typeset.opt()--moduledata.vertical_typese.opt()
---]]
-
---[[配合使用本地夹注模块
-    local jiazhu
-    jiazhu = require("../jiazhu/jiazhu.lua")
-    jiazhu.register()
---]]
-
 \stopluacode
 ```
 
