@@ -7,11 +7,11 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 # ah21
-*.bak
-*.log
-*.pdf
-*.tuc
+*.gitignore
 *.code-workspace
+*.log
+*.tuc
+*.pdf
 
 # Vendors
 node_modules/
