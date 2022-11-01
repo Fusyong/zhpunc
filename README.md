@@ -29,7 +29,7 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
 \stopluacode
 ```
 
-可参考test文件夹下样例脚本中的设置。
+可参考test文件夹下样例脚本中的设置（可能使用了夹注[jiazhu](https://github.com/Fusyong/jiazhu)、竖排[vtypeset](https://github.com/Fusyong/vertical-typesetting)、标点挤压[zhpunc](https://github.com/Fusyong/zhpunc)三个模块）。
 
 ### 编译脚本
 
