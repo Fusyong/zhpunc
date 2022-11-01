@@ -29,6 +29,20 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
 \stopluacode
 ```
 
+可参考test文件夹下样例脚本中的设置。
+
+### 编译脚本
+
+1. 仅在[ConTeXt LMTX](https://wiki.contextgarden.net/Installation)环境测试，其他版本的ConTeXt当不支持。ConTeXt LMTX是与LuaMetaTeX(LuaTeX的后继者)配合使用的、最新的ConTeXt版本。调整后当可用于LuaTeX。可以使用`context --version && luametatex --version`命令查看你的环境版本。
+1. 如下编译排版脚本：
+    >```shell
+    >> context 大学章句.lmtx
+    >```
+1. 如果控制台显示中文时有乱码，可用命令临时改变代码页：
+    >```shell
+    >> chcp 65001
+    >```
+
 ## TODO & bugs
 
 1. [ ] 全部缓存、使用实测的标点字模数据，而不是使用预设的比例，以适应不同字体的实际；
