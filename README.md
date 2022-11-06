@@ -1,5 +1,5 @@
 
-ConTeXt中文标点支持插件。
+ConTeXt中文标点支持插件，支持常用的标点压缩/标点挤压方案，行端标点对齐，以及其他一些功能补强；兼容竖排[vtypeset](https://github.com/Fusyong/vertical-typesetting)插件。
 
 zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构，而二者都基于[liyanrui/zhfonts项目](https://github.com/liyanrui/zhfonts)，谨致谢忱。
 
@@ -12,7 +12,8 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
 
 ```latex
 %%%%%%%%%%%%% 通过入口文件使用 %%%%%%%%%%%%%
-% pattern: quanjiao(default), kaiming, banjiao, yuanyang, hangjian
+% pattern: quanjiao(全角，default), kaiming(开明), banjiao(半角),
+%          yuanyang(原样), hangjian(行间，暂不可用)
 % spacequad: 0.5(default)
 
 \usemodule[zhpunc][pattern=kaiming, spacequad=0.5]
@@ -42,6 +43,12 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
     >```shell
     >> chcp 65001
     >```
+
+## 效果
+
+![plot](https://blog.xiiigame.com/img/2022-02-15-ConTeXt-LMTX中文竖排插件/vtypesetting_callback_1.jpg)
+
+![plot](https://blog.xiiigame.com/img/2022-02-15-ConTeXt-LMTX中文竖排插件/vtypesetting_callback_2.jpg)
 
 ## TODO & bugs
 
