@@ -14,8 +14,8 @@
 
 % 汉字字体配置
 \usetypescriptfile[mscore]
-% \usebodyfont   [mschinese,10.5pt]
-\usebodyfont   [mschinese-light,10.5pt]
+\usebodyfont   [mschinese,10.5pt]
+% \usebodyfont   [mschinese-light,10.5pt]
 % \setupbodyfont [mschinese-literate,10.5pt]
 % \usebodyfont   [mschinese-literate,10.5pt]
 % 定义字体
@@ -36,12 +36,11 @@
 % default: fontname=\tf, fontsize=10.5pt, interlinespace=0.08em
 \usemodule[jiazhu][fontname=\it, fontsize=10.5pt, interlinespace=0.08em]
 
+
 % 标点压缩
 % pattern: quanjiao(default), kaiming, banjiao, yuanyang, hangjian
 % spacequad: 0.5(default)
 \usemodule[zhpunc][pattern=kaiming, spacequad=0.5]
-
-
 
 % 标点宽度测试
 \def\test[#1][#2]{%
