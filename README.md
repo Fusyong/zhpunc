@@ -11,12 +11,21 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
 * 两种使用方法，在排版脚本前言中分别设置如下：
 
 ```latex
-%%%%%%%%%%%%% 通过入口文件使用 %%%%%%%%%%%%%
-% pattern: quanjiao(全角，default), kaiming(开明), banjiao(半角),
-%          yuanyang(原样), hangjian(行间，暂不可用)
-% spacequad: 0.5(default)
+%%%%%%%%%%%%% 使用模块(夹注要在标点压缩后) %%%%%%%%%%%%%
 
-\usemodule[zhpunc][pattern=kaiming, spacequad=0.5]
+% 标点压缩
+% pattern: quanjiao(default), kaiming, banjiao, yuanyang
+% hangjian: false(default), true
+% spacequad: 0.5(default)
+\usemodule[zhpunc][pattern=banjiao, spacequad=0.5, hangjian=false]
+
+% 夹注
+% default: fontname=\tf, fontsize=10.5pt, interlinespace=0.08em
+% \usemodule[jiazhu][fontname=\tf, fontsize=10.5pt, interlinespace=0.08em]
+
+% 竖排
+% \usemodule[vtypeset]
+
 ```
 
 ```lua
@@ -52,24 +61,26 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
 
 ## TODO & bugs
 
-1. [ ] 全部缓存、使用实测的标点字模数据，而不是使用预设的比例，以适应不同字体的实际；
-    1. [x] 缓存标点数据
-    1. [x] 用于标点压缩
-    1. [ ] 用于行首尾对齐版心
-    1. [ ] 用于盒子/夹注首尾对齐版心（**待定**，对窄盒子不利）
-1. [ ] 变“全角标点压缩/挤压”为“半角标点加空”，预制常见的标点加空规则：
-    1. [x] 全角（默认）
-    1. [x] 半角
-    1. [x] 开明
-    1. [x] 原样
-    1. [ ] 行间
-1. [x] 用户可自定加空宽度（默认0.5角）
-1. [x] 支持[直排模块](https://github.com/Fusyong/vertical-typesetting)
-1. [x] 模块化
-1. [ ] 拓展、校正或覆盖系统的`hanzi`脚本的行为（**待定**）
-    1. [x] 修正两侧收缩胶收缩幅度为实有空白，以防重叠
-    1. [ ] 据条件修正两侧拉伸胶的幅度
-1. [ ] 允许用户扩展符号类别（**待定**），如：
+* [ ] 全部缓存、使用实测的标点字模数据，而不是使用预设的比例，以适应不同字体的实际；
+    * [x] 缓存标点数据
+    * [x] 用于标点压缩
+    * [ ] 用于行首尾对齐版心
+    * [ ] 用于盒子/夹注首尾对齐版心（**待定**，对窄盒子不利）
+* [x] 变“全角标点压缩/挤压”为“半角标点加空”，预制常见的标点加空规则：
+    * [x] 全角（默认）
+    * [x] 半角
+    * [x] 开明
+    * [x] 原样
+* [x] 用户可自定加空宽度（默认0.5角）
+* [x] 支持[直排模块](https://github.com/Fusyong/vertical-typesetting)
+* [x] 模块化
+* [ ] 行间标点（仅支持必要的几种标点）
+    * [ ] 校正偏置
+* [ ] 检查标点压缩与夹注两个模块的加载顺序
+* [ ] 拓展、校正或覆盖系统的`hanzi`脚本的行为（**待定**）
+    * [x] 修正两侧收缩胶收缩幅度为实有空白，以防重叠
+    * [ ] 据条件修正两侧拉伸胶的幅度
+* [ ] 允许用户扩展符号类别（**待定**），如：
     * ☆★○●◎◇◆□
     * ㈠㈡㈢⑴⑵⑶⒈⒉⒊ⅠⅡⅢ……
 

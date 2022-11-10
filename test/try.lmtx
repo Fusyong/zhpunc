@@ -14,8 +14,8 @@
 
 % 汉字字体配置
 \usetypescriptfile[mscore]
-% \usebodyfont   [mschinese,20pt]
-\usebodyfont   [mschinese-light,20pt]
+\usebodyfont   [mschinese,20pt]
+% \usebodyfont   [mschinese-light,20pt]
 % \setupbodyfont [mschinese-literate,20pt]
 % \usebodyfont   [mschinese-literate,20pt]
 % \definebodyfontenvironment[24pt]
@@ -38,7 +38,7 @@
 }
 
 %%%%% 显式视觉调试信息 %%%%
-% \showboxes
+\showboxes
 \showframe
 \showglyphs
 % \showmakeup
@@ -46,40 +46,38 @@
 \replacemissingcharacters
 
 
-%%%%%%%%%%%%% 通过入口文件使用 %%%%%%%%%%%%%
-% pattern: quanjiao(default), kaiming, banjiao, yuanyang, hangjian
+%%%%%%%%%%%%% 使用模块(夹注要在标点压缩后) %%%%%%%%%%%%%
+
+% 标点压缩
+% pattern: quanjiao(default), kaiming, banjiao, yuanyang
+% hangjian: false(default), ture
 % spacequad: 0.5(default)
+\usemodule[zhpunc][pattern=banjiao, spacequad=0.5, hangjian=false]
 
-\usemodule[zhpunc][pattern=kaiming, spacequad=0.5]
+% 夹注
+% default: fontname=\tf, fontsize=10.5pt, interlinespace=0.08em
+\usemodule[jiazhu][fontname=\tf, fontsize=10.5pt, interlinespace=0.08em]
 
-%%%%%%%%%%%%% 直接使用lua模块 %%%%%%%%%%%%%
-\startluacode
+% 竖排
+\usemodule[vtypeset]
 
---[[ 使用本地中文标点压缩模块
-    local zhpunc = require("./t-zhpunc.lua")
-    zhpunc.set("kaiming", "0.5") --设置
-    zhpunc.append() --挂载
---]]
-
---[[ 配合使用本地直排模块
-    local vertical_typeset = require("../vertical-typesetting/vertical_typeset.lua")
-    vertical_typeset.opt()--moduledata.vertical_typese.opt()
---]]
-
---[[配合使用本地夹注模块
-    local jiazhu
-    jiazhu = require("../jiazhu/jiazhu.lua")
-    jiazhu.register()
---]]
-
-\stopluacode
+% 标点宽度测试
+\def\test[#1][#2]{%
+    {\showglyphs\showboxes%
+        \inframed[width=#1,align=flushleft,offset=0em]{\hbox{#2}}%
+    }%
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \starttext
 
+我，。你
 
+我“《你
 
-我。我，我
+我\hbox to 0pt{\hss b}你
+
+我\hbox to 0pt{aa\hss}你
 
 
 \stoptext

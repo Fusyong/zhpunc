@@ -1,35 +1,42 @@
 Moduledata = Moduledata or {}
 Moduledata.zhpunc = Moduledata.zhpunc or {}
--- 配合直排
--- 直排模块（判断是否挂载直排，以便处理旋转的标点）
+-- 配合竖排
+-- 竖排模块（判断是否挂载竖排，以便处理旋转的标点）
 Moduledata.vtypeset = Moduledata.vtypeset or {}
 Moduledata.vtypeset.appended = Moduledata.vtypeset.appended or false
 
 -- 标点模式配置，默认全角
-local quanjiao, kaiming, banjiao, yuanyang, hangjian = "quanjiao", "kaiming", "banjiao","yuanyang","hangjian"
+local quanjiao, kaiming, banjiao, yuanyang = "quanjiao", "kaiming", "banjiao","yuanyang"
 
 local hlist_id   = nodes.nodecodes.hlist
 local vlist_id   = nodes.nodecodes.vlist
 local rule_id    = nodes.nodecodes.rule
 local glyph_id   = nodes.nodecodes.glyph --node.id ('glyph')
 local glue_id    = nodes.nodecodes.glue
+local kern_id    = nodes.nodecodes.kern
+local indentskip_id = nodes.subtypes.glue.indentskip
 
 local fonthashes = fonts.hashes
 local fontdata   = fonthashes.identifiers --字体身份表
 
 local node_traverse = node.traverse
+local node_tail = node.tail
+local node_hpack = node.hpack
 local node_insertbefore = node.insertbefore
 local node_insertafter = node.insertafter
 local nodes_pool_kern = nodes.pool.kern
 local node_new = node.new
 local node_copy = node.copy
+local node_copylist = node.copylist
 local node_remove = node.remove
+local node_free = node.free
 local nodes_tasks_appendaction = nodes.tasks.appendaction
 local tex_sp = tex.sp
 
----[[ 结点跟踪工具
-local function show_detail(n, label) 
-    print(">>>>>>>>>"..label.."<<<<<<<<<<")
+--[[ 结点跟踪工具
+local function show_detail(n, label)
+    local l = label or "======="
+    print(">>>>>>>>>"..l.."<<<<<<<<<<")
     print(nodes.toutf(n))
     for i in node.traverse(n) do
         local char
@@ -41,7 +48,7 @@ local function show_detail(n, label)
         elseif i.id == nodes.nodecodes.glue then
             print(i, i.width, i.stretch, i.shrink, i.stretchorder, i.shrinkorder)
         elseif i.id == nodes.nodecodes.hlist then
-            print(i, nodes.toutf(i.list))
+            print(i, nodes.toutf(i.list),i.width,i.height,i.depth,i.shift,i.glue_set,i.glue_sign,i.glue_order)
         else
             print(i)
         end
@@ -160,14 +167,32 @@ local puncs = {
 -- 竖排时要旋转的标点/竖排标点（装在hlist中）
 local puncs_to_rotate = {
     [0x3001] = true,   -- 、
-    [0x3002] = true,   -- 。
     [0xFF0C] = true,   -- ，
+    [0x3002] = true,   -- 。
     [0xFF0E] = true,   -- ．
     [0xFF1A] = true,   -- ：
-    -- 以下，后两位压缩值与前两位相乘后相等，即与直排模块的“居中”一致
+    -- 以下，后两位压缩值与前两位相乘后相等，即与竖排模块的“居中”一致
     [0xFF01] = true,   -- ！
     [0xFF1B] = true,   -- ；
     [0xFF1F] = true,   -- ？
+}
+
+-- 行间符号
+local puncs_to_hangjian = {
+    [0x3001] = true,   -- 、
+    [0xFF0C] = true,   -- ，
+    [0x3002] = true,   -- 。
+    [0xFF0E] = true,   -- ．
+    [0xFF1A] = true,   -- ：
+
+    [0xFF01] = true,   -- ！
+    [0xFF1B] = true,   -- ；
+    [0xFF1F] = true,   -- ？
+
+    [0x2018] = true,  -- ‘
+    [0x2019] = true,  -- ’
+    [0x201C] = true,  -- “
+    [0x201D] = true,  -- ”
 }
 
 -- 是标点结点
@@ -175,7 +200,7 @@ local puncs_to_rotate = {
 -- @return: false | 1 | 2 （不是标点 | 一般标点 | 将要旋转的标点）
 local function is_punc(n)
     if n.id == glyph_id then
-        -- 直排旋转标点
+        -- 竖排旋转标点
         if Moduledata.vtypeset.appended and puncs_to_rotate[n.char] then
             return 2
         elseif puncs[n.char] then
@@ -196,6 +221,21 @@ local function is_left_sign(n)
         return false
     end
 end
+
+-- 是右标号
+local function is_right_sign(n)
+    local p_class = puncs[n.char]
+    if p_class == puncs_right_sign
+    or p_class == puncs_inner_point
+    or p_class == puncs_ending_point
+    then
+        return true
+    else
+        return false
+    end
+end
+
+-- 同组末尾结点
 
 local function is_visible_node(n)
     local ids = {
@@ -241,6 +281,91 @@ local function prev_punc(n)
         prev_n = prev_n.prev
     end
     return nil --n顶头
+end
+
+-- 标点类别，-1：左；0：中；1：右
+local function punc_class(n)
+    if is_left_sign(n) then
+        return  -1
+    elseif is_right_sign(n) then
+        return 1
+    else
+        return 0
+    end
+end
+
+local function node_remove_list(head, n, m)
+    local to_freed
+    while n and n ~= m do
+        if to_freed then
+            node_free(to_freed)
+        end
+        to_freed = n
+        head,n = node_remove(head, n)
+    end
+    return head, n
+end
+
+-- 剪切从某个起始的同类标点（左标点、右标点、其余/中标点）组的末尾
+local function cut_punc_group(head, n)
+    local begin = n
+    local p_class = punc_class(n)
+    local the_end = n.next
+    n = next_punc(n)
+    while n do
+        if puncs_to_hangjian[n.char] and p_class == punc_class(n) then
+            the_end = n.next
+            n = next_punc(n)
+        else
+            break
+        end
+    end
+
+    -- 覆盖前后的kern TODO 更可靠的逻辑
+    local pre = begin.prev
+    if pre and pre.id == kern_id then
+        begin = pre
+    end
+    if the_end and the_end.id == kern_id then
+        the_end = the_end.next
+    end
+    local copyed_list = node_copylist(begin, the_end)
+    local current
+    head, current = node_remove_list(head, begin, the_end)
+    return head, current, copyed_list, p_class
+end
+
+-- 以hlist形式插入列表
+local function insert_list_before(head, current, list, p_class)
+    -- local l = node_new(hlist_id)
+    -- l.head = list
+
+    -- 模拟\hss，插入列表首尾
+    local hss = node_new(glue_id)
+    hss.stretch = 65536
+    hss.stretchorder = 2
+    hss.shrink = 65536
+    hss.shrinkorder = 2
+    hss.width = 0
+    if p_class == 1 then
+        list,_ = node_insertbefore(list, list, hss)
+    elseif p_class == -1 then
+        list,_ = node_insertafter(list, node_tail(list), hss)
+    end
+
+    -- 把列表装入0宽度的盒子中
+    local box = node_new(hlist_id, "box")
+    box.head = list
+    -- local box, _ = node_hpack(list)
+    box.width = 0
+    box.shift = -tex_sp("1ex")
+
+    head, current = node_insertbefore(head,current, box)
+
+    -- show_detail(box.head, "boxhead")
+    -- show_detail(current, "current")
+
+    return head, current
 end
 
 -- 处理每个标点前后的kern
@@ -379,23 +504,11 @@ local function process_punc (head, n)
         end
     end
 
-    if  Moduledata.zhpunc.model == hangjian then
-        -- TODO 同组标点整体提升、对齐
-        local l = node_new("hlist")
-        local w = n.width
-        l.width = 0
-        l.list =  node_copy(n) --复制结点到新建的结点列表\hbox下
-        -- 替换原结点
-        head, l = node_insertafter(head, n, l)
-        head, l = node_remove(head, n) -- 删除销毁结点会出错
-
-    end
-
     return head
 
 end
 
--- 迭代段落结点列表，处理标点组
+-- 压缩标点
 local function compress_punc (head)
     for n in node_traverse(head) do
         if is_punc(n) then
@@ -405,10 +518,29 @@ local function compress_punc (head)
     return head
 end
 
+-- 实现行间标点
+local function raise_punc_to_hangjian(head)
+    -- show_detail(head,"1111111111")
+    local n = head
+    while n do
+        if puncs_to_hangjian[n.char] then
+            local list, p_class
+            head, n, list, p_class = cut_punc_group(head,n)
+            -- show_detail(list,"2222222222")
+            head, n = insert_list_before(head, n, list, p_class)
+        else
+            n = n.next
+        end
+    end
+    return head
+end
 
 -- 包装回调任务：分行前的过滤器
 function Moduledata.zhpunc.my_linebreak_filter (head)
     head = compress_punc (head)
+    if Moduledata.zhpunc.hangjian then
+        head = raise_punc_to_hangjian(head)
+    end
     return head, true
 end
 
@@ -461,15 +593,21 @@ function Moduledata.zhpunc.align_left_puncs(head)
         end
         it = it.next
     end
-    -- print(":::分摊行头压缩后nodes.tosequence(head):::")
-    -- print(nodes.tosequence(head))
     return head, done
 end
 
 -- 传参设置
-function Moduledata.zhpunc.set(pattern, spacequad)
-    Moduledata.zhpunc.model = pattern or quanjiao
-    Moduledata.zhpunc.space_quad = spacequad or 0.5
+function Moduledata.zhpunc.set(pattern, spacequad, hangjian)
+    Moduledata.zhpunc.model = pattern
+    if hangjian == "false" then
+        hangjian = false
+    elseif hangjian == "true" then
+        hangjian = true
+    else
+        hangjian = false
+    end
+    Moduledata.zhpunc.hangjian = hangjian
+    Moduledata.zhpunc.space_quad = spacequad
 end
 
 -- 挂载/启动任务
@@ -518,7 +656,7 @@ local function update_protrusions()
         [0xFF1B] = { 0, 0.17 },   -- ；
         [0xFF1A] = { 0, 0.65 },   -- ：
     }
-    -- 直排时更新
+    -- 竖排时更新
     if Moduledata.vtypeset.appended then
         local puncs_to_rotated = {
             [0x3001] = {0, 0.65},   -- 、
