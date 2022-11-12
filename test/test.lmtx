@@ -42,7 +42,7 @@
 \usemodule[jiazhu][fontname=\tf, fontsize=10.5pt, interlinespace=0.08em]
 
 % 竖排
-\usemodule[vtypeset]
+% \usemodule[vtypeset]
 
 % 标点宽度测试
 \def\test[#1][#2]{%

@@ -49,6 +49,8 @@ local function show_detail(n, label)
             print(i, i.width, i.stretch, i.shrink, i.stretchorder, i.shrinkorder)
         elseif i.id == nodes.nodecodes.hlist then
             print(i, nodes.toutf(i.list),i.width,i.height,i.depth,i.shift,i.glue_set,i.glue_sign,i.glue_order)
+        elseif i.id == nodes.nodecodes.kern then
+            print(i, i.kern, i.expension)
         else
             print(i)
         end
@@ -336,7 +338,7 @@ local function cut_punc_group(head, n)
 end
 
 -- 以hlist形式插入列表
-local function insert_list_before(head, current, list, p_class)
+local function insert_list_before(head, current, list, p_class,quad)
     -- local l = node_new(hlist_id)
     -- l.head = list
 
@@ -354,16 +356,10 @@ local function insert_list_before(head, current, list, p_class)
     end
 
     -- 把列表装入0宽度的盒子中
-    local box = node_new(hlist_id, "box")
-    box.head = list
-    -- local box, _ = node_hpack(list)
-    box.width = 0
-    box.shift = -tex_sp("1ex")
+    local box, _ = node_hpack(list,0,"exactly")
+    box.shift = -quad * 0.4
 
     head, current = node_insertbefore(head,current, box)
-
-    -- show_detail(box.head, "boxhead")
-    -- show_detail(current, "current")
 
     return head, current
 end
@@ -520,14 +516,18 @@ end
 
 -- 实现行间标点
 local function raise_punc_to_hangjian(head)
-    -- show_detail(head,"1111111111")
     local n = head
     while n do
         if puncs_to_hangjian[n.char] then
+            -- 缓存、取用quad
+            local font = n.font
+            puncs_font[font] = puncs_font[font] or {}
+            puncs_font[font]["quad"] = puncs_font[font]["quad"] or fontdata[font].parameters.quad -- 用结点宽度代替？？？
+            local quad = puncs_font[font]["quad"]
+
             local list, p_class
             head, n, list, p_class = cut_punc_group(head,n)
-            -- show_detail(list,"2222222222")
-            head, n = insert_list_before(head, n, list, p_class)
+            head, n = insert_list_before(head, n, list, p_class, quad)
         else
             n = n.next
         end
@@ -592,7 +592,9 @@ function Moduledata.zhpunc.align_left_puncs(head)
             end
         end
         it = it.next
+
     end
+
     return head, done
 end
 
@@ -621,15 +623,6 @@ end
 
 
 local function update_protrusions()
-
-    -- 标点悬挂/突出
-    local classes = fonts.protrusions.classes
-    local vectors = fonts.protrusions.vectors
-    -- 挂载悬挂表、注册悬挂类
-    classes.myvector = {
-    vector = 'myvector',
-    factor = 1,
-    }
     
     -- 合并两表到新表myvector，而不是修改font-ext.lua中的vectors.quality
     -- TODO 补齐，使用实测数据并缓存
@@ -670,19 +663,22 @@ local function update_protrusions()
         }
         my_vectors_quality = table.merged (my_vectors_quality, puncs_to_rotated)
     end
+
+    -- 挂载悬挂表、注册悬挂类
+    local classes = fonts.protrusions.classes
+    classes.myvector = {
+        vector = 'myvector',
+        factor = 1,
+    }
     
+    -- 标点悬挂/突出
+    local vectors = fonts.protrusions.vectors
     vectors.myvector = table.merged (vectors.quality,my_vectors_quality)
     
     -- 扩展原有的字体特性default(后)为default(前)
     context.definefontfeature({"default"},{"default"},{mode="node",protrusion="myvector",liga="yes"})
     -- 在字体定义中应用或立即应用（ 注意脚本的引用时机; 只能一种字体？？ TODO）
     context.definedfont({"Serif*default"})
-    --[[
-    % 扩展原有的字体特性default(后)为default(前)
-    \definefontfeature[default][default][mode=node,protrusion=myvector,liga=yes]
-    % 或立即应用（只能一种字体？？注意脚本的引用时机）
-    \definedfont[Serif*default]
-    --]]
 
 end
 update_protrusions() --更新标点悬挂数据

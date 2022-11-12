@@ -92,18 +92,18 @@
 % pattern: quanjiao(default), kaiming, banjiao, yuanyang
 % hangjian: false(default), ture
 % spacequad: 0.5(default)
-\usemodule[zhpunc][pattern=kaiming, spacequad=0.5, hangjian=false]
+\usemodule[zhpunc][pattern=banjiao, spacequad=0.5, hangjian=true]
 
 % 夹注
-% default: fontname=\tf, fontsize=10.5pt, interlinespace=0.08em
-\usemodule[jiazhu][fontname=\tf, fontsize=10.5pt, interlinespace=0.08em]
+% default: fontname=\tf, fontsize=10.5pt, interlinespace=0.08em(行间标点时：0.15em)
+\usemodule[jiazhu][fontname=\tf, fontsize=10.5pt, interlinespace=0.15em]
 
 % 竖排
 \usemodule[vtypeset]
 
 %%%%% 显式视觉调试信息 %%%%
-\showboxes
-\showglyphs
+% \showboxes
+% \showglyphs
 \showframe
 % \showmakeup
 % \tracingnodes1 %1,2
