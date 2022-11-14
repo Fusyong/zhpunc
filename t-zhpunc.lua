@@ -308,7 +308,7 @@ local function node_remove_list(head, n, m)
     return head, n
 end
 
--- 剪切从某个起始的同类标点（左标点、右标点、其余/中标点）组的末尾
+-- 剪切从某个起始的同类标点（左标点、右标点、其余/中标点）组
 local function cut_punc_group(head, n)
     local begin = n
     local p_class = punc_class(n)
@@ -327,6 +327,12 @@ local function cut_punc_group(head, n)
     local pre = begin.prev
     if pre and pre.id == kern_id then
         begin = pre
+    end
+    -- 取消前置胶的弹性 TODO 更可靠的逻辑
+    pre = begin.prev
+    if pre and pre.id == glue_id then
+        pre.stretch = 0
+        pre.shrink = 0
     end
     if the_end and the_end.id == kern_id then
         the_end = the_end.next
@@ -614,16 +620,13 @@ end
 
 -- 挂载/启动任务
 function Moduledata.zhpunc.append()
-    -- 段落分行前回调（最后调用）
+    -- 预处理后（段落分行前）回调
     nodes_tasks_appendaction("processors","after","Moduledata.zhpunc.my_linebreak_filter")
-    -- 段落分行后回调（最后调用）
+    -- 段落分行后回调
     nodes_tasks_appendaction("finalizers", "after", "Moduledata.zhpunc.align_left_puncs")
 end
 
-
-
 local function update_protrusions()
-    
     -- 合并两表到新表myvector，而不是修改font-ext.lua中的vectors.quality
     -- TODO 补齐，使用实测数据并缓存
     -- 横排时    
