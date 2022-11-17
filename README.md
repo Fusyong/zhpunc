@@ -77,6 +77,7 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
     * [x] 开明
     * [x] 原样
 * [x] 用户可自定加空宽度（默认0.5角）
+    * [ ] 可收缩一半（**待定**）
 * [x] 支持[直排模块](https://github.com/Fusyong/vertical-typesetting)
 * [x] 模块化
 * [x] 行间标点

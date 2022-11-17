@@ -10,6 +10,7 @@ local quanjiao, kaiming, banjiao, yuanyang = "quanjiao", "kaiming", "banjiao","y
 
 local hlist_id   = nodes.nodecodes.hlist
 local vlist_id   = nodes.nodecodes.vlist
+local penalty_id   = nodes.nodecodes.penalty
 local rule_id    = nodes.nodecodes.rule
 local glyph_id   = nodes.nodecodes.glyph --node.id ('glyph')
 local glue_id    = nodes.nodecodes.glue
@@ -33,7 +34,7 @@ local node_free = node.free
 local nodes_tasks_appendaction = nodes.tasks.appendaction
 local tex_sp = tex.sp
 
---[[ 结点跟踪工具
+---[[ 结点跟踪工具
 local function show_detail(n, label)
     local l = label or "======="
     print(">>>>>>>>>"..l.."<<<<<<<<<<")
@@ -370,7 +371,7 @@ local function insert_list_before(head, current, list, p_class,quad)
     return head, current
 end
 
--- 处理每个标点前后的kern
+-- 处理每个标点前后的kern和胶
 local function process_punc (head, n)
     
     -- 取得结点字体的描述（未缩放的原始字模信息）
@@ -445,13 +446,12 @@ local function process_punc (head, n)
     end
 
 
-    local prev = prev_punc(n)
-    local next = next_punc(n)
+    local prev_p = prev_punc(n)
+    local next_p = next_punc(n)
 
     -- 实际占位半角的标点可能加空
     if  final_quad == 0.5
-        and (Moduledata.zhpunc.model == quanjiao or  Moduledata.zhpunc.model == kaiming)
-            then
+        and (Moduledata.zhpunc.model == quanjiao or  Moduledata.zhpunc.model == kaiming) then
         
         local space_table = inserting_space[ Moduledata.zhpunc.model]
         
@@ -459,9 +459,9 @@ local function process_punc (head, n)
         local next_space
         local next_space_table = space_table[puncs[n.char]]
         if next_space_table then
-            if next then -- 后面是标点
-                next_space = next_space_table[puncs[next.char]]
-            elseif next == false then -- 是非标点可见结点（不是末尾nil）
+            if next_p then -- 后面是标点
+                next_space = next_space_table[puncs[next_p.char]]
+            elseif next_p == false then -- 是非标点可见结点（不是末尾nil）
                 next_space = next_space_table[puncs_no]
             end
             if next_space then
@@ -474,7 +474,7 @@ local function process_punc (head, n)
         -- 全角(前面无标点、不是行头时)前加空
         if  Moduledata.zhpunc.model == quanjiao then
             local pre_space
-            if prev == false then
+            if prev_p == false then
                 pre_space = space_table[puncs_no][puncs[n.char]]
             end
             if pre_space then
@@ -487,22 +487,46 @@ local function process_punc (head, n)
 
     -- 尽可能调整为半字标点
     if  Moduledata.zhpunc.model ~= yuanyang then
-        -- 插入kern
-        local k
-        head,k = node_insertbefore (head, n, nodes_pool_kern (l_kern))
-        head,k = node_insertafter (head, n, nodes_pool_kern (r_kern))
 
-        -- 更改系统插入右标点后、所有标点前的半字收缩胶 TODO 或更改scrp-cjk.lua
-        if next or prev then
-            local g = k.next
-            while g do
-                if g.id == glyph_id then
-                    break
-                elseif g.id == glue_id and g.shrink then
-                    g.shrink = one_side_space
+        -- 寻找hanzi脚本注入的前、后的收缩胶
+        local function the_shrink_glue(current_n, dir)
+            while current_n do
+
+                if dir == "next" then
+                    current_n = current_n.next
+                end
+                if dir == "prev" then
+                    current_n = current_n.prev
+                end
+
+                if current_n then
+                    if not (current_n.id == glue_id or current_n.id == penalty_id) then
+                        break
+                    else
+                        if current_n.id == glue_id and current_n.shrink > 0 then
+                            return current_n
+                        end
+                    end
+                else
                     break
                 end
-                g = g.next
+            end
+        end
+
+        -- 插入kern、更改收缩胶 TODO 可能改到属于左右字符的收缩胶，应更健壮
+        local k
+        if l_kern then
+            head,k = node_insertbefore (head, n, nodes_pool_kern (l_kern))
+            local shinnk_glue = the_shrink_glue(k, "prev")
+            if shinnk_glue then
+                shinnk_glue.shrink = one_side_space
+            end
+        end
+        if r_kern then
+            head,k = node_insertafter (head, n, nodes_pool_kern (r_kern))
+            local shinnk_glue = the_shrink_glue(k, "next")
+            if shinnk_glue then
+                shinnk_glue.shrink = one_side_space
             end
         end
     end
@@ -548,6 +572,7 @@ function Moduledata.zhpunc.my_linebreak_filter (head)
     if Moduledata.zhpunc.hangjian then
         head = raise_punc_to_hangjian(head)
     end
+    -- show_detail(head,"here")
     return head, true
 end
 
@@ -676,7 +701,7 @@ local function update_protrusions()
         -- [0xff0f] = puncs_half_junction, -- ／   Solidus
     }
     -- 竖排时更新
-    if Moduledata.vtypeset.appended then
+    if Moduledata.vtypeset then -- 检测不到Moduledata.vtypeset.appended
         local puncs_to_rotated = {
             [0x3001] = {0, 0.65},   -- 、
             [0xFF0C] = {0, 0.5},   -- ，
