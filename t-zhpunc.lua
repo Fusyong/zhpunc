@@ -633,17 +633,30 @@ local function update_protrusions()
     -- 横排时    
     local my_vectors_quality = {
         [0x2018] = { 0.60, 0 },  -- ‘
-        [0x2019] = { 0, 0.60 },  -- ’
         [0x201C] = { 0.50, 0 },  -- “
-        [0x201D] = { 0, 0.35 },  -- ”
         [0x300C] = { 0.50, 0 }, -- 「
         [0x300E] = { 0.50, 0 }, -- 『
-        [0x300A] = { 0.40, 0 },  -- 《
-        [0x300B] = { 0, 0.60 },  -- 》
+        [0x3014] = { 0.50, 0 }, -- 〔
+        [0xFF3B] = { 0.50, 0 }, -- ［
+        [0x3016] = { 0.50, 0 }, -- 〖
+        [0x3010] = { 0.50, 0 }, -- 【
+        [0xFF5B] = { 0.50, 0 }, -- ｛
+        [0xFF08] = { 0.50, 0 }, -- （
+        [0x3008] = { 0.50, 0 }, -- 〈
+        [0x300A] = { 0.40, 0 }, -- 《
+        [0x2019] = { 0, 0.60 }, -- ’
+        [0x201D] = { 0, 0.35 }, -- ”
+        [0x300D] = { 0, 0.60 }, -- 」
+        [0x300F] = { 0, 0.60 }, -- 』
+        [0x300B] = { 0, 0.60 }, -- 》
         [0x3009] = { 0, 0.60 }, -- 〉
-        [0x3011] = { 0, 0.50 }, -- 】
-        [0xFF08] = { 0.50, 0 },  -- （
-        [0xFF09] = { 0, 0.60 },  -- ）
+        [0x3011] = { 0, 0.60 }, -- 】
+        [0xFF09] = { 0, 0.60 }, -- ）
+        [0x3015] = { 0, 0.60 }, -- 〕
+        [0xFF3D] = { 0, 0.60 }, -- ］
+        [0x3017] = { 0, 0.60 }, -- 〗
+        [0xFF5D] = { 0, 0.60 }, -- ｝
+
         [0x3001] = { 0, 0.65 },  -- 、
         [0xFF0c] = { 0, 0.65 },  -- ，
         [0x3002] = { 0, 0.60 },  -- 。
@@ -652,6 +665,15 @@ local function update_protrusions()
         [0xFF1F] = { 0, 0.65 },  -- ？
         [0xFF1B] = { 0, 0.17 },   -- ；
         [0xFF1A] = { 0, 0.65 },   -- ：
+
+
+        -- [0x2026] = puncs_ellipsis, -- …
+        -- [0x2014] = puncs_dash, -- — 半字线，兼puncs_full_junction
+        -- [0xff5e] = puncs_full_junction, -- ～ 半字线
+        -- [0x00b7] = puncs_half_junction, -- ·   MIDDLE DOT
+        -- [0x002D] = puncs_half_junction, -- -   Hyphen-Minus. Will there be any side effects?
+        -- [0x002F] = puncs_half_junction, -- /   Solidus
+        -- [0xff0f] = puncs_half_junction, -- ／   Solidus
     }
     -- 竖排时更新
     if Moduledata.vtypeset.appended then
