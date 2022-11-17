@@ -41,6 +41,7 @@
 \showboxes
 \showframe
 \showglyphs
+% \showbodyfont
 % \showmakeup
 % \tracingnodes1 %1,2
 \replacemissingcharacters
@@ -52,14 +53,14 @@
 % pattern: quanjiao(default), kaiming, banjiao, yuanyang
 % hangjian: false(default), ture
 % spacequad: 0.5(default)
-\usemodule[zhpunc][pattern=banjiao, spacequad=0.5, hangjian=true]
+\usemodule[zhpunc][pattern=quanjiao, spacequad=0.5, hangjian=false]
 
 % 夹注
-% default: fontname=\tf, fontsize=10.5pt, interlinespace=0.08em
-\usemodule[jiazhu][fontname=\tf, fontsize=10.5pt, interlinespace=0.08em]
+% default: fontname=tt, fontsize=10.5pt, interlinespace=0.08em
+\usemodule[jiazhu][fontname=it, fontsize=10.5pt, interlinespace=0.08em]
 
 % 竖排
-\usemodule[vtypeset]
+% \usemodule[vtypeset]
 
 % 标点宽度测试
 \def\test[#1][#2]{%
@@ -71,8 +72,20 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \starttext
 
+\the\jiazhfont
 
-我。你
+\dorecurse{18}{%
+你%
+}。%
+\dorecurse{20}{%
+我%
+}。他他她%
+
+正文\jiazh{注释注释注释}正文
+
+{\tt 我们abc}
+
+我们
 
 % <node :   3213 <=   3184 =>   3026 : hlist box> 。      0       0       0       -503424 nil     nil     nil
     % <node :    nil <=   3142 =>   1714 : glue userskip>     0       65536   65536   2       2
@@ -80,7 +93,6 @@
     % <node :   1714 <=   3390 =>   1708 : glyph unset>       。
     % <node :   3390 <=   1708 =>    nil : kern userkern>     -655500 nil
 
-a{\raise 1.5ex\hbox to 0pt{\hss b}}c
 
 % <node :   3364 <=   3490 =>   3505 : hlist box> b       0       947052  18648   -755136 nil     nil     nil
     % <node :    nil <=   3468 =>   3475 : glue userskip>     0       65536   65536   2       2

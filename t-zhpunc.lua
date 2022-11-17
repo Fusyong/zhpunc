@@ -191,10 +191,10 @@ local puncs_to_hangjian = {
     [0xFF1B] = true,   -- ；
     [0xFF1F] = true,   -- ？
 
-    [0x2018] = true,  -- ‘
-    [0x2019] = true,  -- ’
-    [0x201C] = true,  -- “
-    [0x201D] = true,  -- ”
+    -- [0x2018] = true,  -- ‘
+    -- [0x2019] = true,  -- ’
+    -- [0x201C] = true,  -- “
+    -- [0x201D] = true,  -- ”
 }
 
 -- 是标点结点
@@ -420,8 +420,9 @@ local function process_punc (head, n)
         end
         
         local two_space -- 两侧总空
-        if w_in < (desc_width / 2) then
-            -- 半角标点，半字宽
+        -- if w_in < (desc_width * 0.45) then
+            -- 实际宽度小于0.45角时，调整为0.5角/半字宽(使冒号为全角)
+        if w_in < (desc_width * 0.5) then
             two_space = (desc_width / 2) - w_in
             final_quad = 0.5
         else
@@ -555,6 +556,7 @@ function Moduledata.zhpunc.align_left_puncs(head)
     local it = head
     while it do
         if it.id == hlist_id then
+            -- show_detail(head,"处理行头标点前")
             local e = it.head
             local neg_kern = nil
             local hit = nil
@@ -600,7 +602,6 @@ function Moduledata.zhpunc.align_left_puncs(head)
         it = it.next
 
     end
-
     return head, done
 end
 
@@ -673,11 +674,11 @@ local function update_protrusions()
         vector = 'myvector',
         factor = 1,
     }
-    
+
     -- 标点悬挂/突出
     local vectors = fonts.protrusions.vectors
     vectors.myvector = table.merged (vectors.quality,my_vectors_quality)
-    
+
     -- 扩展原有的字体特性default(后)为default(前)
     context.definefontfeature({"default"},{"default"},{mode="node",protrusion="myvector",liga="yes"})
     -- 在字体定义中应用或立即应用（ 注意脚本的引用时机; 只能一种字体？？ TODO）

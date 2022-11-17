@@ -34,6 +34,31 @@
 }
 \appendtoks \zhpuncappend \to \everystarttext
 
+% 行左专名号和书名号
+\startuseMPgraphic{rules:under:zhuanming}
+    numeric head; head := 2; 
+    draw ((0,RuleDepth) -- (RuleWidth-head*2,RuleDepth))
+        shifted (head,RuleFactor*RuleOffset)
+        % dashed dashpattern(on RuleFactor/2 off RuleFactor/2)
+        withpen pencircle scaled RuleThickness
+        withcolor RuleColor ;
+    setbounds currentpicture to unitsquare xysized(RuleWidth,RuleHeight) ;
+\stopuseMPgraphic
+
+\startuseMPgraphic{rules:under:shuming}
+    numeric head; head := 2; 
+    draw curvedfunction("x","0.4sin(2x)",0,RuleWidth-head*2,pi/100)
+        shifted (head,RuleFactor*RuleOffset)
+        % dashed dashpattern(on RuleFactor/2 off RuleFactor/2)
+        withpen pencircle scaled RuleThickness
+        withcolor RuleColor ;
+    setbounds currentpicture to unitsquare xysized(RuleWidth,RuleHeight) ;
+\stopuseMPgraphic
+
+\definebar[zhuanmh] [mp=rules:under:zhuanming, offset=-.3, order=background, continue=yes] % method=0,
+\definebar[shumh]   [zhuanmh][mp=rules:under:shuming, offset=-.1]
+
+
 \protect
 \stopmodule
 \endinput

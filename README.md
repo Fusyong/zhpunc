@@ -12,21 +12,35 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
 
 ```latex
 %%%%%%%%%%%%% 使用模块(夹注要在标点压缩后) %%%%%%%%%%%%%
+% 
+% 标点压缩与支持
+% 
+\usemodule[zhpunc][pattern=quanjiao, spacequad=0.5, hangjian=false]
+% 
+% 四种标点压缩方案：全角、开明、半角、原样：
+%   pattern: quanjiao(default), kaiming, banjiao, yuanyang
+% 行间标点（转换`、，。．：！；？`到行间，pattern建议用banjiao）：
+%   hangjian: false(default), true
+% 加空宽度（角）：
+%   spacequad: 0.5(default)
+% 
+% 行间书名号和专名号（\bar实例）：
+%   \zhuanmh{专名}
+%   \shumh{书名}
 
-% 四种标点压缩方案：全角、开明、半角、原样
-% pattern: quanjiao(default), kaiming, banjiao, yuanyang
-% 行间标点（结合竖排插件使用，pattern建议用banjiao）
-% hangjian: false(default), true
-% 加空宽度（角）
-% spacequad: 0.5(default)
-\usemodule[zhpunc][pattern=banjiao, spacequad=0.5, hangjian=false]
 
+% 
 % 夹注
-% default: fontname=\tf, fontsize=10.5pt, interlinespace=0.08em
-% \usemodule[jiazhu][fontname=\tf, fontsize=10.5pt, interlinespace=0.08em]
+% 
+\usemodule[jiazhu][fontname=tf, fontsize=10.5pt, interlinespace=0.08em]
+% default: fontname=tf, fontsize=10.5pt, interlinespace=0.08em(行间标点时约0.2em)
+% fontname和fontsize与\switchtobodyfont的对应参数一致
 
+
+% 
 % 竖排
-% \usemodule[vtypeset]
+% 
+\usemodule[vtypeset]
 
 ```
 
@@ -66,8 +80,11 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
 * [x] 支持[直排模块](https://github.com/Fusyong/vertical-typesetting)
 * [x] 模块化
 * [x] 行间标点
-    * [x] 仅支持`、，。．：！；？‘’“”`(引号可能会删除)
-    * [x] 校正偏置
+    * [x] 支持`、，。．：！；？`
+* [x] 优化行间书名号和专名号
+    * [x] 相对字号
+    * [x] 间断问题
+    * [x] 自制metapost，头尾留空
 * [ ] 检查标点压缩与夹注两个模块的加载顺序
 * [ ] 新制分行算法，替代官方的`hanzi`
     * [ ] 据条件确定两侧拉伸胶的幅度
