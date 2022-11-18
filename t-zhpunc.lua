@@ -34,7 +34,7 @@ local node_free = node.free
 local nodes_tasks_appendaction = nodes.tasks.appendaction
 local tex_sp = tex.sp
 
----[[ 结点跟踪工具
+--[[ 结点跟踪工具
 local function show_detail(n, label)
     local l = label or "======="
     print(">>>>>>>>>"..l.."<<<<<<<<<<")
@@ -612,8 +612,10 @@ local function raise_punc_to_hangjian(head)
     return head
 end
 
+
+
 -- 包装回调任务：分行前的过滤器
-function Moduledata.zhpunc.my_linebreak_filter (head)
+function Moduledata.zhpunc.process_puncs(head)
     head = compress_punc (head)
     if Moduledata.zhpunc.hangjian then
         head = raise_punc_to_hangjian(head)
@@ -693,12 +695,12 @@ end
 -- 挂载/启动任务
 function Moduledata.zhpunc.append()
     -- 预处理后（段落分行前）回调
-    nodes_tasks_appendaction("processors","after","Moduledata.zhpunc.my_linebreak_filter")
+    nodes_tasks_appendaction("processors","after","Moduledata.zhpunc.process_puncs")
     -- 段落分行后回调
     nodes_tasks_appendaction("finalizers", "after", "Moduledata.zhpunc.align_left_puncs")
 end
 
-local function update_protrusions()
+function Moduledata.zhpunc.update_protrusions()
     -- 合并两表到新表myvector，而不是修改font-ext.lua中的vectors.quality
     -- TODO 补齐，使用实测数据并缓存
     -- 横排时    
@@ -734,7 +736,7 @@ local function update_protrusions()
         [0xFF0E] = { 0, 0.50 },  -- ．
         [0xFF01] = { 0, 0.65 },   -- ！
         [0xFF1F] = { 0, 0.65 },  -- ？
-        [0xFF1B] = { 0, 0.17 },   -- ；
+        [0xFF1B] = { 0, 0.65 },   -- ；
         [0xFF1A] = { 0, 0.65 },   -- ：
 
 
@@ -747,10 +749,10 @@ local function update_protrusions()
         -- [0xff0f] = puncs_half_junction, -- ／   Solidus
     }
     -- 竖排时更新
-    if Moduledata.vtypeset then -- 检测不到Moduledata.vtypeset.appended
+    if Moduledata.vtypeset.appended then -- 检测不到Moduledata.vtypeset.appended
         local puncs_to_rotated = {
             [0x3001] = {0, 0.65},   -- 、
-            [0xFF0C] = {0, 0.5},   -- ，
+            [0xFF0C] = {0, 0.55},   -- ，
             [0x3002] = {0, 0.6},   -- 。
             [0xFF0E] = {0, 0.6},   -- ．
             [0xFF1A] = {0, 0.3},   -- ：
@@ -778,7 +780,7 @@ local function update_protrusions()
     context.definedfont({"Serif*default"})
 
 end
-update_protrusions() --更新标点悬挂数据
+Moduledata.zhpunc.update_protrusions() --更新标点悬挂数据
 
 return Moduledata.zhpunc
 
