@@ -61,12 +61,9 @@ end
 
 
 -- 标点缓存数据
--- {
---     font={
---         [0x2018]={kern_l, kern_r, one_side_space, final_quad}, -- 左kern、右kern、单侧空（左右对齐用）、最终应用宽度（角，用于判断是否加空）
---         ...
---     },
---     ...
+-- {font=
+--    {char={l_kern=, r_kern=, one_side_space=, final_quad=}},
+--    {quad=}
 -- }
 local puncs_font = {}
 
@@ -154,15 +151,16 @@ local puncs = {
     [0x2026] = puncs_ellipsis, -- …
 
     -- 破折号
-    [0x2014] = puncs_dash, -- — 半字线，兼puncs_full_junction
+    [0x2014] = puncs_dash, -- — 一字线，兼puncs_full_junction
 
     -- 全角连接号
-    [0xff5e] = puncs_full_junction, -- ～ 半字线
+    [0xff5e] = puncs_full_junction, -- ～ 一字线
 
     -- 半角连接号
     [0x00b7] = puncs_half_junction, -- ·   MIDDLE DOT
-    [0x002D] = puncs_half_junction, -- -   Hyphen-Minus. Will there be any side effects?
-    [0x002F] = puncs_half_junction, -- /   Solidus
+    -- 不处理半角字符
+    -- [0x002D] = puncs_half_junction, -- -   Hyphen-Minus. Will there be any side effects?
+    -- [0x002F] = puncs_half_junction, -- /   Solidus
     -- ext
     [0xff0f] = puncs_half_junction, -- ／   Solidus
 }
@@ -198,6 +196,20 @@ local puncs_to_hangjian = {
     -- [0x201D] = true,  -- ”
 }
 
+-- 全角标点
+local full_quad_puncs = {
+    [0x2026] = true, -- …
+    [0x2014] = true, -- — 半字线，兼puncs_full_junction
+    [0xff5e] = true, -- ～ 半字线
+    [0xff0f] = true, -- ／   Solidus
+}
+-- 竖排全角标点
+local v_full_quad_puncs = {
+    [0xFF01] = true,   -- ！
+    [0xFF1B] = true,   -- ；
+    [0xFF1F] = true,   -- ？
+}
+
 -- 是标点结点
 -- @n: glyph | hlist
 -- @return: false | 1 | 2 （不是标点 | 一般标点 | 将要旋转的标点）
@@ -213,6 +225,22 @@ local function is_punc(n)
         end
     else
         return false
+    end
+end
+
+-- 是全角标点结点
+-- @n: glyph | hlist
+-- @return: boolean
+local function is_full_quad_punc(n)
+    if n.id == glyph_id then
+        local char = n.char
+        if full_quad_puncs[char] then
+            return true
+        elseif Moduledata.vtypeset.appended and v_full_quad_puncs[char] then
+            return true
+        elseif is_punc(n) then
+            return false
+        end
     end
 end
 
@@ -371,10 +399,10 @@ local function insert_list_before(head, current, list, p_class,quad)
     return head, current
 end
 
--- 处理每个标点前后的kern和胶
-local function process_punc (head, n)
-    
-    -- 取得结点字体的描述（未缩放的原始字模信息）
+
+-- 计算、缓存并返回标点数据
+local function punc_data(n)
+
     local char = n.char
     local font = n.font
 
@@ -387,24 +415,23 @@ local function process_punc (head, n)
     local final_quad
 
     puncs_font[font] = puncs_font[font] or {}
+
     -- 空铅
-    puncs_font[font]["quad"] = puncs_font[font]["quad"] or fontdata[font].parameters.quad -- 用结点宽度代替？？？
+    puncs_font[font]["quad"] = puncs_font[font]["quad"] or fontdata[font].parameters.quad
+    -- 英文字体quad多变，稳定的是fontdata[font].parameters.units-- em的单元数，通常是1000
     local quad = puncs_font[font]["quad"]
 
     puncs_font[font][char] = puncs_font[font][char] or {}
-    if  #puncs_font[font][char] >0 then -- 从表中取用
-        l_kern =  puncs_font[font][char][1]
-        r_kern =  puncs_font[font][char][2]
-        one_side_space = puncs_font[font][char][3]
-        final_quad = puncs_font[font][char][4]
-    else -- 计算并缓存
+
+    if  #puncs_font[font][char] < 1 then
         local desc = fontdata[font].descriptions[char]
-        local desc_width = desc.width
+        local desc_width = desc.width -- 外框宽度
         
-        if not desc then return end --???
+        -- if not desc then return end --???
         local boundingbox = desc.boundingbox
         local x1 =  boundingbox[1]
         local x2 =  boundingbox[3]
+        
         local w_in --内框宽度
         local left_space --前空
         local right_space -- 后空
@@ -421,43 +448,58 @@ local function process_punc (head, n)
         end
         
         local two_space -- 两侧总空
-        -- if w_in < (desc_width * 0.45) then
-            -- 实际宽度小于0.45角时，调整为0.5角/半字宽(使冒号为全角)
-        if w_in < (desc_width * 0.5) then
-            two_space = (desc_width / 2) - w_in
-            final_quad = 0.5
-        else
+        if is_full_quad_punc(n) then
             -- 全角标点，整字宽
             two_space = desc_width - w_in
             final_quad = 1
+        else
+            -- 半角标点
+            two_space = (desc_width / 2) - w_in
+            final_quad = 0.5
         end
         -- 再居中
-        l_kern = (two_space/2 - left_space) / desc_width * quad  --左kern比例
-        puncs_font[font][char][1] = l_kern
-        r_kern = (two_space/2 - right_space) / desc_width * quad --右kern比例
-        puncs_font[font][char][2] = r_kern
+        l_kern = (two_space/2 - left_space) / desc_width * quad  --左kern
+        puncs_font[font][char]["l_kern"] = l_kern
+        r_kern = (two_space/2 - right_space) / desc_width * quad --右kern
+        puncs_font[font][char]["r_kern"] = r_kern
 
         -- 左、右侧空白（供对齐行头、右侧收缩用）  TODO
-        one_side_space = (two_space/2) / desc_width * quad
-        puncs_font[font][char][3] = one_side_space
+        one_side_space = (two_space/2)  / desc_width * quad
+        puncs_font[font][char]["one_side_space"] = one_side_space
 
         -- 实际字宽（角）
-        puncs_font[font][char][4] = final_quad
-    end
+        puncs_font[font][char]["final_quad"] = final_quad
 
+    end
+    return puncs_font[font][char]
+end
+
+-- 处理每个标点前后的kern和胶
+local function process_punc (head, n)
+
+    local p_data, l_kern, r_kern, one_side_space, final_quad, quad
+    p_data = punc_data(n)
+    if p_data then
+        l_kern = p_data["l_kern"]
+        r_kern = p_data["r_kern"]
+        one_side_space = p_data["one_side_space"]
+        final_quad = p_data["final_quad"]
+    end
+    quad = puncs_font[n.font]["quad"]
 
     local prev_p = prev_punc(n)
     local next_p = next_punc(n)
-
+    
     -- 实际占位半角的标点可能加空
     if  final_quad == 0.5
-        and (Moduledata.zhpunc.model == quanjiao or  Moduledata.zhpunc.model == kaiming) then
+    and (Moduledata.zhpunc.model == quanjiao or  Moduledata.zhpunc.model == kaiming) then
         
         local space_table = inserting_space[ Moduledata.zhpunc.model]
         
         -- 后加空
+        local char = n.char
         local next_space
-        local next_space_table = space_table[puncs[n.char]]
+        local next_space_table = space_table[puncs[char]]
         if next_space_table then
             if next_p then -- 后面是标点
                 next_space = next_space_table[puncs[next_p.char]]
@@ -468,6 +510,7 @@ local function process_punc (head, n)
                 local space = node_new(glue_id)
                 space.width = next_space * quad * Moduledata.zhpunc.space_quad
                 head,_ = node_insertafter (head, n, space)
+                -- TODO 加罚点和半空压缩胶水
             end
         end
         
@@ -475,12 +518,13 @@ local function process_punc (head, n)
         if  Moduledata.zhpunc.model == quanjiao then
             local pre_space
             if prev_p == false then
-                pre_space = space_table[puncs_no][puncs[n.char]]
+                pre_space = space_table[puncs_no][puncs[char]]
             end
             if pre_space then
                 local space = node_new(glue_id)
                 space.width = pre_space * quad * Moduledata.zhpunc.space_quad
                 head,_ = node_insertbefore (head, n, space)
+                -- TODO 加罚点和半空压缩胶水
             end
         end
     end
@@ -515,16 +559,20 @@ local function process_punc (head, n)
 
         -- 插入kern、更改收缩胶 TODO 可能改到属于左右字符的收缩胶，应更健壮
         local k
-        if l_kern then
-            head,k = node_insertbefore (head, n, nodes_pool_kern (l_kern))
-            local shinnk_glue = the_shrink_glue(k, "prev")
-            if shinnk_glue then
-                shinnk_glue.shrink = one_side_space
+        local shinnk_glue
+        head,k = node_insertbefore (head, n, nodes_pool_kern (l_kern))
+        shinnk_glue = the_shrink_glue(k, "prev")
+        if shinnk_glue then --前面的收缩，考虑前面是标点的情况
+            local shrink = one_side_space
+            if prev_p then
+                shrink = one_side_space + punc_data(prev_p)["one_side_space"]
             end
+            shinnk_glue.shrink = shrink
         end
-        if r_kern then
-            head,k = node_insertafter (head, n, nodes_pool_kern (r_kern))
-            local shinnk_glue = the_shrink_glue(k, "next")
+        
+        head,k = node_insertafter (head, n, nodes_pool_kern (r_kern))
+        if  not next_p then --仅处理后面不是标时
+            shinnk_glue = the_shrink_glue(k, "next")
             if shinnk_glue then
                 shinnk_glue.shrink = one_side_space
             end
@@ -550,10 +598,8 @@ local function raise_punc_to_hangjian(head)
     local n = head
     while n do
         if puncs_to_hangjian[n.char] then
-            -- 缓存、取用quad
+            punc_data(n) --更新标点数据
             local font = n.font
-            puncs_font[font] = puncs_font[font] or {}
-            puncs_font[font]["quad"] = puncs_font[font]["quad"] or fontdata[font].parameters.quad -- 用结点宽度代替？？？
             local quad = puncs_font[font]["quad"]
 
             local list, p_class
@@ -597,7 +643,7 @@ function Moduledata.zhpunc.align_left_puncs(head)
             if hit ~= nil then
                 -- 文本行整体向左偏移
                     -- local quad = quaddata[font]
-                neg_kern = -puncs_font[hit.font][hit.char][3] --ah21
+                neg_kern = -puncs_font[hit.font][hit.char]["one_side_space"] --ah21
                 -- neg_kern = -left_puncs[hit.char] * fontdata[hit.font].parameters.quad --ah21
                 node_insertbefore(head, hit, nodes_pool_kern(neg_kern))
                 -- 统计字符个数
