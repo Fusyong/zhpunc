@@ -614,6 +614,8 @@ local function raise_punc_to_hangjian(head)
     return head
 end
 
+
+
 -- 分行前的标点处理：压缩与加空；行间
 function Moduledata.zhpunc.process_puncs(head)
     -- show_detail(head,"1before")
@@ -625,6 +627,62 @@ function Moduledata.zhpunc.process_puncs(head)
     return head, true
 end
 
+-- 分行后处理对齐
+function Moduledata.zhpunc.align_left_puncs(head)
+    local it = head
+    while it do
+        if it.id == hlist_id then
+            show_detail(it.head,"1111")
+            local e = it.head
+            local neg_kern = nil
+            local hit = nil
+            while e do
+                if is_punc(e) then
+                    if is_left_sign(e) then
+                        hit = e
+                    end
+                    break
+                end
+                e = e.next
+            end
+            if hit ~= nil then
+                -- 文本行整体向左偏移
+                    -- local quad = quaddata[font]
+                neg_kern = -puncs_font[hit.font][hit.char]["one_side_space"] --ah21
+                -- neg_kern = -left_puncs[hit.char] * fontdata[hit.font].parameters.quad --ah21
+                node_insertbefore(head, hit, nodes_pool_kern(neg_kern))
+                -- 统计字符个数
+                local w = 0
+                local x = hit
+                while x do
+                    if is_punc(x) then w = w + 1 end
+                    x = x.next
+                end
+                if w == 0 then w = 1 end
+                -- 将 neg_kern 分摊出去
+                x = it.head -- 重新遍历
+                local av_neg_kern = -neg_kern/w
+                local i = 0
+                while x do
+                    if is_punc(x) then
+                        i = i + 1
+                        -- 最后一个字符之后不插入 kern
+                        if i < w then 
+                            node_insertafter(head, x, nodes_pool_kern(av_neg_kern))
+                        end
+                    end
+                    x = x.next
+                end
+            end
+            show_detail(it.head,"222")
+        end
+        it = it.next
+        
+    end
+    
+    return head, done
+end
+
 -- 两端凸排
 function Moduledata.zhpunc.protrude(head)
     -- show_detail(head,"before")
@@ -633,6 +691,7 @@ function Moduledata.zhpunc.protrude(head)
     if head_p and is_left_sign(head_p) then
         local n_data = punc_data(head_p)
         local left_space = n_data["left_space"]
+        -- local left_space = -puncs_font[n.font][n.char]["one_side_space"] --ah21
         local kern = node_new(kern_id, "leftmarginkern")
         kern.kern = -left_space
         head, kern = node_insertbefore(head, head_p, kern)
@@ -703,6 +762,88 @@ function Moduledata.zhpunc.append()
     -- nodes_tasks_appendaction("finalizers", "after", "Moduledata.zhpunc.align_left_puncs")
     nodes_tasks_appendaction("finalizers", "after", "Moduledata.zhpunc.protrude_main")
 end
+
+function Moduledata.zhpunc.update_protrusions()
+    -- 合并两表到新表myvector，而不是修改font-ext.lua中的vectors.quality
+    -- TODO 补齐，使用实测数据并缓存
+    -- 横排时    
+    local my_vectors_quality = {
+        [0x2018] = { 0.60, 0 },  -- ‘
+        [0x201C] = { 0.50, 0 },  -- “
+        [0x300C] = { 0.50, 0 }, -- 「
+        [0x300E] = { 0.50, 0 }, -- 『
+        [0x3014] = { 0.50, 0 }, -- 〔
+        [0xFF3B] = { 0.50, 0 }, -- ［
+        [0x3016] = { 0.50, 0 }, -- 〖
+        [0x3010] = { 0.50, 0 }, -- 【
+        [0xFF5B] = { 0.50, 0 }, -- ｛
+        [0xFF08] = { 0.50, 0 }, -- （
+        [0x3008] = { 0.50, 0 }, -- 〈
+        [0x300A] = { 0.40, 0 }, -- 《
+        [0x2019] = { 0, 0.60 }, -- ’
+        [0x201D] = { 0, 0.35 }, -- ”
+        [0x300D] = { 0, 0.60 }, -- 」
+        [0x300F] = { 0, 0.60 }, -- 』
+        [0x300B] = { 0, 0.60 }, -- 》
+        [0x3009] = { 0, 0.60 }, -- 〉
+        [0x3011] = { 0, 0.60 }, -- 】
+        [0xFF09] = { 0, 0.60 }, -- ）
+        [0x3015] = { 0, 0.60 }, -- 〕
+        [0xFF3D] = { 0, 0.60 }, -- ］
+        [0x3017] = { 0, 0.60 }, -- 〗
+        [0xFF5D] = { 0, 0.60 }, -- ｝
+
+        [0x3001] = { 0, 0.65 },  -- 、
+        [0xFF0c] = { 0, 0.65 },  -- ，
+        [0x3002] = { 0, 0.60 },  -- 。
+        [0xFF0E] = { 0, 0.50 },  -- ．
+        [0xFF01] = { 0, 0.65 },   -- ！
+        [0xFF1F] = { 0, 0.65 },  -- ？
+        [0xFF1B] = { 0, 0.65 },   -- ；
+        [0xFF1A] = { 0, 0.65 },   -- ：
+
+
+        -- [0x2026] = puncs_ellipsis, -- …
+        -- [0x2014] = puncs_dash, -- — 半字线，兼puncs_full_junction
+        -- [0xff5e] = puncs_full_junction, -- ～ 半字线
+        -- [0x00b7] = puncs_half_junction, -- ·   MIDDLE DOT
+        -- [0x002D] = puncs_half_junction, -- -   Hyphen-Minus. Will there be any side effects?
+        -- [0x002F] = puncs_half_junction, -- /   Solidus
+        -- [0xff0f] = puncs_half_junction, -- ／   Solidus
+    }
+    -- 竖排时更新
+    if Moduledata.vtypeset.appended then -- 检测不到Moduledata.vtypeset.appended
+        local puncs_to_rotated = {
+            [0x3001] = {0, 0.65},   -- 、
+            [0xFF0C] = {0, 0.55},   -- ，
+            [0x3002] = {0, 0.6},   -- 。
+            [0xFF0E] = {0, 0.6},   -- ．
+            [0xFF1A] = {0, 0.3},   -- ：
+            [0xFF01] = {0, 0.1},   -- ！
+            [0xFF1B] = {0, 0.15},   -- ；
+            [0xFF1F] = {0, 0.1},   -- ？
+        }
+        my_vectors_quality = table.merged (my_vectors_quality, puncs_to_rotated)
+    end
+
+    -- 挂载悬挂表、注册悬挂类
+    local classes = fonts.protrusions.classes
+    classes.myvector = {
+        vector = 'myvector',
+        factor = 1,
+    }
+
+    -- 标点悬挂/突出
+    local vectors = fonts.protrusions.vectors
+    vectors.myvector = table.merged (vectors.quality,my_vectors_quality)
+
+    -- 扩展原有的字体特性default(后)为default(前)
+    context.definefontfeature({"default"},{"default"},{mode="node",protrusion="myvector",liga="yes"})
+    -- 在字体定义中应用或立即应用（ 注意脚本的引用时机; 只能一种字体？？ TODO）
+    context.definedfont({"Serif*default"})
+
+end
+-- Moduledata.zhpunc.update_protrusions() --更新标点悬挂数据
 
 return Moduledata.zhpunc
 

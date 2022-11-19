@@ -106,8 +106,8 @@
 
 %%%%% 显式视觉调试信息 %%%%
 % \showboxes
-% \showglyphs
-% \showframe
+\showglyphs
+\showframe
 % \showmakeup
 % \tracingnodes1 %1,2
 

@@ -1,8 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 演示：
-%% 在processors类回调中干预断行；
-%% tex.linebreak()的用法；
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % \setuppapersize[A4,landscape]
 \setuppapersize[A4]
 
@@ -84,52 +79,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \starttext
 
-囗·囗
+《我我我\jiazh{〈本，謂身也。所厚謂家也〉〈此兩節結上文兩節之意}我我我我我我我我我》
+《我我我
 
-囗-囗
-
-囗/囗
-
-囗，囗
-
-
-
-% 囗囗。囗囗
-
-
-
-% \test[4.5em][囗囗。《囗]
-
-
-% 我\jiazh{本，謂身也。所厚，謂家也。此兩節結上文兩節之意。}
-
-% 我：“你？！”\jiazh{本，謂身也。所厚，謂家也。此兩節結上文兩節之意。}
-
-% <node :   3213 <=   3184 =>   3026 : hlist box> 。      0       0       0       -503424 nil     nil     nil
-    % <node :    nil <=   3142 =>   1714 : glue userskip>     0       65536   65536   2       2
-    % <node :   3142 <=   1714 =>   3390 : kern userkern>     0       nil
-    % <node :   1714 <=   3390 =>   1708 : glyph unset>       。
-    % <node :   3390 <=   1708 =>    nil : kern userkern>     -655500 nil
-
-
-% <node :   3364 <=   3490 =>   3505 : hlist box> b       0       947052  18648   -755136 nil     nil     nil
-    % <node :    nil <=   3468 =>   3475 : glue userskip>     0       65536   65536   2       2
-    % <node :   3468 <=   3475 =>    nil : glyph unset>       b
-
-% 标点压缩在前夹注在后缺失凸排（？？夹注造成的parinitrightskip）
-% ...
-% <node :   4827 <=   3650 =>   4830 : glyph unset>       ，
-% <node :   3650 <=   4830 =>   4994 : kern userkern>     0       nil
-% <node :   4830 <=   4994 =>   5426 : glue parinitrightskip>     0       0       0       0       0
-% <node :   4994 <=   5426 =>   5447 : glue rightskip>    0       0       0       0       0
-% <node :   5426 <=   5447 =>    nil : glue righthangskip>        0       0       0       0       0
-
-% 标点压缩在后夹注在前正确凸排
-% ...
-% <node :   4917 <=   4040 =>   5467 : glyph unset>       ，
-% <node :   4040 <=   5467 =>   4920 : kern rightmarginkern>      -852150 nil
-% <node :   5467 <=   4920 =>   4385 : kern userkern>     0       nil
-% <node :   4920 <=   4385 =>   5484 : glue rightskip>    0       0       0       0       0
-% <node :   4385 <=   5484 =>    nil : glue righthangskip>        0       0       0       0       0
+% <node :   3865 <=   4045 =>   4042 : kern rightmarginkern>      613548000       nil
+% <node :   4584 <=   4371 =>   3885 : kern leftmarginkern>       613548000       nil
 
 \stoptext
