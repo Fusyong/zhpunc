@@ -65,7 +65,7 @@ end
 --    {char={l_kern=, r_kern=, one_side_space=, final_quad=}},
 --    {quad=}
 -- }
-local puncs_font = {}
+Moduledata.zhpunc.puncs_font = {}
 
 -- 标点分类
 -- 语义单元前
@@ -401,7 +401,7 @@ end
 
 
 -- 计算、缓存并返回标点数据
-local function punc_data(n)
+function Moduledata.zhpunc.punc_data(n)
 
     local char = n.char
     local font = n.font
@@ -414,16 +414,16 @@ local function punc_data(n)
     -- 最终应用宽度
     local final_quad
 
-    puncs_font[font] = puncs_font[font] or {}
+    Moduledata.zhpunc.puncs_font[font] = Moduledata.zhpunc.puncs_font[font] or {}
 
     -- 空铅
-    puncs_font[font]["quad"] = puncs_font[font]["quad"] or fontdata[font].parameters.quad
+    Moduledata.zhpunc.puncs_font[font]["quad"] = Moduledata.zhpunc.puncs_font[font]["quad"] or fontdata[font].parameters.quad
     -- 英文字体quad多变，稳定的是fontdata[font].parameters.units-- em的单元数，通常是1000
-    local quad = puncs_font[font]["quad"]
+    local quad = Moduledata.zhpunc.puncs_font[font]["quad"]
 
-    puncs_font[font][char] = puncs_font[font][char] or {}
+    Moduledata.zhpunc.puncs_font[font][char] = Moduledata.zhpunc.puncs_font[font][char] or {}
 
-    if  #puncs_font[font][char] < 1 then
+    if  #Moduledata.zhpunc.puncs_font[font][char] < 1 then
         local desc = fontdata[font].descriptions[char]
         local desc_width = desc.width -- 外框宽度
         
@@ -446,8 +446,8 @@ local function punc_data(n)
             right_space = desc_width - left_space - desc_depth - desc.height
             w_in =  desc_depth + desc.height
         end
-        puncs_font[font][char]["left_space"] = left_space / desc_width * quad
-        puncs_font[font][char]["right_space"] = right_space / desc_width * quad
+        Moduledata.zhpunc.puncs_font[font][char]["left_space"] = left_space / desc_width * quad
+        Moduledata.zhpunc.puncs_font[font][char]["right_space"] = right_space / desc_width * quad
         
         local two_space -- 两侧总空
         if is_full_quad_punc(n) then
@@ -461,33 +461,33 @@ local function punc_data(n)
         end
         -- 再居中
         l_kern = (two_space/2 - left_space) / desc_width * quad  --左kern
-        puncs_font[font][char]["l_kern"] = l_kern
+        Moduledata.zhpunc.puncs_font[font][char]["l_kern"] = l_kern
         r_kern = (two_space/2 - right_space) / desc_width * quad --右kern
-        puncs_font[font][char]["r_kern"] = r_kern
+        Moduledata.zhpunc.puncs_font[font][char]["r_kern"] = r_kern
 
         -- 左、右侧空白（供对齐行头、右侧收缩用）  TODO
         one_side_space = (two_space/2)  / desc_width * quad
-        puncs_font[font][char]["one_side_space"] = one_side_space
+        Moduledata.zhpunc.puncs_font[font][char]["one_side_space"] = one_side_space
 
         -- 实际字宽（角）
-        puncs_font[font][char]["final_quad"] = final_quad
+        Moduledata.zhpunc.puncs_font[font][char]["final_quad"] = final_quad
 
     end
-    return puncs_font[font][char]
+    return Moduledata.zhpunc.puncs_font[font][char]
 end
 
 -- 处理每个标点前后的kern和胶
 local function process_punc (head, n)
 
     local p_data, l_kern, r_kern, one_side_space, final_quad, quad
-    p_data = punc_data(n)
+    p_data = Moduledata.zhpunc.punc_data(n)
     if p_data then
         l_kern = p_data["l_kern"]
         r_kern = p_data["r_kern"]
         one_side_space = p_data["one_side_space"]
         final_quad = p_data["final_quad"]
     end
-    quad = puncs_font[n.font]["quad"]
+    quad = Moduledata.zhpunc.puncs_font[n.font]["quad"]
 
     local prev_p = prev_punc(n)
     local next_p = next_punc(n)
@@ -567,7 +567,7 @@ local function process_punc (head, n)
         if shinnk_glue then --前面的收缩，考虑前面是标点的情况
             local shrink = one_side_space
             if prev_p then
-                shrink = one_side_space + punc_data(prev_p)["one_side_space"]
+                shrink = one_side_space + Moduledata.zhpunc.punc_data(prev_p)["one_side_space"]
             end
             shinnk_glue.shrink = shrink
         end
@@ -600,9 +600,9 @@ local function raise_punc_to_hangjian(head)
     local n = head
     while n do
         if puncs_to_hangjian[n.char] then
-            punc_data(n) --更新标点数据
+            Moduledata.zhpunc.punc_data(n) --更新标点数据
             local font = n.font
-            local quad = puncs_font[font]["quad"]
+            local quad = Moduledata.zhpunc.puncs_font[font]["quad"]
 
             local list, p_class
             head, n, list, p_class = cut_punc_group(head,n)
@@ -631,7 +631,7 @@ function Moduledata.zhpunc.protrude(head)
     -- 左侧
     local head_p = next_punc(head)
     if head_p and is_left_sign(head_p) then
-        local n_data = punc_data(head_p)
+        local n_data = Moduledata.zhpunc.punc_data(head_p)
         local left_space = n_data["left_space"]
         local kern = node_new(kern_id, "leftmarginkern")
         kern.kern = -left_space
@@ -646,7 +646,7 @@ function Moduledata.zhpunc.protrude(head)
     -- 右侧
     local tail_p = prev_punc(node_tail(head))
     if tail_p and is_right_sign(tail_p) then
-        local n_data = punc_data(tail_p)
+        local n_data = Moduledata.zhpunc.punc_data(tail_p)
         local right_space = n_data["right_space"]
         -- local right_space = -puncs_font[n.font][n.char]["one_side_space"] --ah21
         local kern = node_new(kern_id, "rightmarginkern")

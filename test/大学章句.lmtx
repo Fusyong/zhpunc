@@ -82,7 +82,7 @@
 
 
 % 标点压缩与支持
-\usemodule[zhpunc][pattern=kaiming, spacequad=0.5, hangjian=false]
+\usemodule[zhpunc][pattern=banjiao, spacequad=0.5, hangjian=true]
 % 
 % 四种标点压缩方案：全角、开明、半角、原样：
 %   pattern: quanjiao(default), kaiming, banjiao, yuanyang
@@ -106,7 +106,7 @@
 
 %%%%% 显式视觉调试信息 %%%%
 % \showboxes
-\showglyphs
+% \showglyphs
 \showframe
 % \showmakeup
 % \tracingnodes1 %1,2
