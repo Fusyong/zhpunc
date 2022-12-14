@@ -44,7 +44,7 @@ zhpunc项目是对[zhfonts](https://github.com/Fusyong/zhfonts)项目的重构�
 
 ### 编译脚本
 
-1. 仅在[ConTeXt LMTX](https://wiki.contextgarden.net/Installation)环境测试，其他版本的ConTeXt当不支持。ConTeXt LMTX是与LuaMetaTeX(LuaTeX的后继者)配合使用的、最新的ConTeXt版本。调整后当可用于LuaTeX。可以使用`context --version && luametatex --version`命令查看你的环境版本。
+1. 仅在[ConTeXt LMTX](https://wiki.contextgarden.net/Installation)环境测试。ConTeXt LMTX是与LuaMetaTeX(LuaTeX的后继者)配合使用的、最新的ConTeXt版本。调整后当可用于LuaTeX。可以使用`context --version && luametatex --version`命令查看你的环境版本。
 1. 如下编译排版脚本：
     >```shell
     >> context 大学章句.lmtx

@@ -4,6 +4,7 @@
 %% tex.linebreak()的用法；
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \setuppapersize[A4,landscape]
+\setuppapersize[A4]
 
 % 中文配置
 \mainlanguage[cn]
@@ -78,11 +79,11 @@
 
 %%%%%%%%%%%%% 使用模块(保持顺序) %%%%%%%%%%%%%
 % 竖排
-\usemodule[vtypeset]
+% \usemodule[vtypeset]
 
 
 % 标点压缩与支持
-\usemodule[zhpunc][pattern=banjiao, spacequad=0.5, hangjian=true]
+\usemodule[zhpunc][pattern=kaiming, spacequad=0.5, hangjian=false]
 % 
 % 四种标点压缩方案：全角、开明、半角、原样：
 %   pattern: quanjiao(default), kaiming, banjiao, yuanyang
