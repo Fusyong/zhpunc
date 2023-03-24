@@ -44,7 +44,7 @@
 
 %%%%%%%%%%%%% 使用模块(保持顺序) %%%%%%%%%%%%%
 % 竖排
-\usemodule[vtypeset]
+% \usemodule[vtypeset]
 
 
 % 标点压缩与支持
@@ -76,17 +76,24 @@
     }%
 }
 
-\startluacode
-require("lldebugger").start()
-\stopluacode
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \starttext
+
+% 《我我我\jiazh{〈本，謂身也。所厚謂家也〉〈此兩節結上文兩節之意}我我我我我我我我我》
+% 《我我我
+
+% % <node :   3865 <=   4045 =>   4042 : kern rightmarginkern>      613548000       nil
+% % <node :   4584 <=   4371 =>   3885 : kern leftmarginkern>       613548000       nil
+
+% \stoptext
+
+
 \starttext
 
-《我我我\jiazh{〈本，謂身也。所厚謂家也〉〈此兩節結上文兩節之意}我我我我我我我我我》
-《我我我
-
-% <node :   3865 <=   4045 =>   4042 : kern rightmarginkern>      613548000       nil
-% <node :   4584 <=   4371 =>   3885 : kern leftmarginkern>       613548000       nil
+\placetable{Caption}
+{\bTABLE
+\bTR \bTD One \eTD \bTD two \eTD \eTR
+\bTR \bTD 一百个。 \eTD \bTD 一百个。一百个。一百个。一百个。一百个。一百个。一百个。一百个。 \eTD \eTR
+\eTABLE}
 
 \stoptext

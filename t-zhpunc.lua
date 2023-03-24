@@ -15,7 +15,8 @@ local rule_id    = nodes.nodecodes.rule
 local glyph_id   = nodes.nodecodes.glyph --node.id ('glyph')
 local glue_id    = nodes.nodecodes.glue
 local kern_id    = nodes.nodecodes.kern
-local indentskip_id = nodes.subtypes.glue.indentskip
+-- local indentskip_id = nodes.subtypes.glue.indentskip
+-- local righthangskip_id = nodes.subtypes.glue.righthangskip
 
 local fonthashes = fonts.hashes
 local fontdata   = fonthashes.identifiers --字体身份表
@@ -27,18 +28,19 @@ local node_insertbefore = node.insertbefore
 local node_insertafter = node.insertafter
 local nodes_pool_kern = nodes.pool.kern
 local node_new = node.new
-local node_copy = node.copy
+-- local node_copy = node.copy
 local node_copylist = node.copylist
 local node_remove = node.remove
 local node_free = node.free
 local nodes_tasks_appendaction = nodes.tasks.appendaction
-local tex_sp = tex.sp
+-- local tex_sp = tex.sp
 
----[[ 结点跟踪工具
-local function show_detail(n, label)
+--[[ 结点跟踪工具
+local function show_following_nodes(n, label)
     local l = label or "======="
     print(">>>>>>>>>"..l.."<<<<<<<<<<")
-    print(nodes.toutf(n))
+    print("utf: ", nodes.toutf(n))
+    print("following_nodes: ")
     for i in node.traverse(n) do
         local char
         if i.id == glyph_id then
@@ -266,16 +268,16 @@ local function is_right_sign(n)
     end
 end
 
--- 同组末尾结点
-
+-- 可见结点
 local function is_visible_node(n)
+    -- TODO 参考 node.traverselist(), loops over nodes that have content: hlist, vlist, glue with leaders, glyphs, disc and rules nodes.
     local ids = {
         [hlist_id] = true,
         [vlist_id] = true,
         [rule_id ] = true,
         [glyph_id] = true,
     }
-    if ids[n.id] then --  and n.width > 0且有实际宽度（必要吗？？？）
+    if ids[n.id] then -- and n.width > 0 且有实际宽度（必要吗？？？） 
         return true
     else
         return false
@@ -628,6 +630,9 @@ end
 -- 两端凸排
 function Moduledata.zhpunc.protrude(head)
     -- show_detail(head,"before")
+
+    local is_changed = false
+
     -- 左侧
     local head_p = next_punc(head)
     if head_p and is_left_sign(head_p) then
@@ -641,6 +646,7 @@ function Moduledata.zhpunc.protrude(head)
         if prev_n.id == kern_id then
             prev_n.kern = 0
         end
+        is_changed = true
     end
     
     -- 右侧
@@ -657,23 +663,28 @@ function Moduledata.zhpunc.protrude(head)
         if next_n.id == kern_id then
             next_n.kern = 0
         end
+        is_changed = true
     end
     
     -- show_detail(head,"after")
-    return head
+    return head, is_changed
 end
 
 
--- 仅处理段落列表
+-- 仅处理有改变的段落列表
 function Moduledata.zhpunc.protrude_main(head)
     local n = head
     while n do
         if n.id == hlist_id then
-            local copy_list = node_copylist(n.head)
-            -- 更改后再次包装为相同长度的vlist，即可重设胶性
-            local new_n = node_hpack( Moduledata.zhpunc.protrude(copy_list),n.width, "exactly")
-            head, new_n = node_insertbefore(head, n, new_n)
-            head, n = node_remove(head, n, true)
+            local out_head, is_changed = Moduledata.zhpunc.protrude(node_copylist(n.head))
+            if is_changed then
+                -- 更改后再次包装为相同长度的vlist，即可重设胶性
+                local new_n = node_hpack(out_head ,n.width, "exactly")
+                head, new_n = node_insertbefore(head, n, new_n)
+                head, n = node_remove(head, n, true)
+            else
+                n = n.next
+            end
         else
             n = n.next
         end
