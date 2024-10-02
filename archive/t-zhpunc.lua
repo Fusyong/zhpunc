@@ -1,9 +1,9 @@
-Moduledata = Moduledata or {}
-Moduledata.zhpunc = Moduledata.zhpunc or {}
+Thirddata = Thirddata or {}
+Thirddata.zhpunc = Thirddata.zhpunc or {}
 -- 配合竖排
 -- 竖排模块（判断是否挂载竖排，以便处理旋转的标点）
-Moduledata.vtypeset = Moduledata.vtypeset or {}
-Moduledata.vtypeset.appended = Moduledata.vtypeset.appended or false
+Thirddata.vtypeset = Thirddata.vtypeset or {}
+Thirddata.vtypeset.appended = Thirddata.vtypeset.appended or false
 
 -- 标点模式配置，默认全角
 local quanjiao, kaiming, banjiao, yuanyang = "quanjiao", "kaiming", "banjiao","yuanyang"
@@ -216,7 +216,7 @@ local v_full_quad_puncs = {
 local function is_punc(n)
     if n.id == glyph_id then
         -- 竖排旋转标点
-        if Moduledata.vtypeset.appended and puncs_to_rotate[n.char] then
+        if Thirddata.vtypeset.appended and puncs_to_rotate[n.char] then
             return 2
         elseif puncs[n.char] then
             return 1
@@ -236,7 +236,7 @@ local function is_full_quad_punc(n)
         local char = n.char
         if full_quad_puncs[char] then
             return true
-        elseif Moduledata.vtypeset.appended and v_full_quad_puncs[char] then
+        elseif Thirddata.vtypeset.appended and v_full_quad_puncs[char] then
             return true
         elseif is_punc(n) then
             return false
@@ -494,9 +494,9 @@ local function process_punc (head, n)
     
     -- 实际占位半角的标点可能加空
     if  final_quad == 0.5
-    and (Moduledata.zhpunc.model == quanjiao or  Moduledata.zhpunc.model == kaiming) then
+    and (Thirddata.zhpunc.model == quanjiao or  Thirddata.zhpunc.model == kaiming) then
         
-        local space_table = inserting_space[ Moduledata.zhpunc.model]
+        local space_table = inserting_space[ Thirddata.zhpunc.model]
         
         -- 后加空
         local char = n.char
@@ -510,21 +510,21 @@ local function process_punc (head, n)
             end
             if next_space then
                 local space = node_new(glue_id)
-                space.width = next_space * quad * Moduledata.zhpunc.space_quad
+                space.width = next_space * quad * Thirddata.zhpunc.space_quad
                 head,_ = node_insertafter (head, n, space)
                 -- TODO 加罚点和半空压缩胶水
             end
         end
         
         -- 全角(前面无标点、不是行头时)前加空
-        if  Moduledata.zhpunc.model == quanjiao then
+        if  Thirddata.zhpunc.model == quanjiao then
             local pre_space
             if prev_p == false then
                 pre_space = space_table[puncs_no][puncs[char]]
             end
             if pre_space then
                 local space = node_new(glue_id)
-                space.width = pre_space * quad * Moduledata.zhpunc.space_quad
+                space.width = pre_space * quad * Thirddata.zhpunc.space_quad
                 head,_ = node_insertbefore (head, n, space)
                 -- TODO 加罚点和半空压缩胶水
             end
@@ -532,7 +532,7 @@ local function process_punc (head, n)
     end
 
     -- 尽可能调整为半字标点
-    if  Moduledata.zhpunc.model ~= yuanyang then
+    if  Thirddata.zhpunc.model ~= yuanyang then
 
         -- 寻找hanzi脚本注入的前、后的收缩胶
         local function the_shrink_glue(current_n, dir)
@@ -617,10 +617,10 @@ end
 
 
 -- 分行前的标点处理：压缩与加空；行间
-function Moduledata.zhpunc.process_puncs(head)
+function Thirddata.zhpunc.process_puncs(head)
     -- show_detail(head,"1before")
     head = compress_punc (head)
-    if Moduledata.zhpunc.hangjian then
+    if Thirddata.zhpunc.hangjian then
         head = raise_punc_to_hangjian(head)
     end
     -- show_detail(head,"1after")
@@ -628,7 +628,7 @@ function Moduledata.zhpunc.process_puncs(head)
 end
 
 -- 分行后处理对齐
-function Moduledata.zhpunc.align_left_puncs(head)
+function Thirddata.zhpunc.align_left_puncs(head)
     local it = head
     while it do
         if it.id == hlist_id then
@@ -684,7 +684,7 @@ function Moduledata.zhpunc.align_left_puncs(head)
 end
 
 -- 两端凸排
-function Moduledata.zhpunc.protrude(head)
+function Thirddata.zhpunc.protrude(head)
     -- show_detail(head,"before")
     -- 左侧
     local head_p = next_punc(head)
@@ -724,13 +724,13 @@ end
 
 
 -- 仅处理段落列表
-function Moduledata.zhpunc.protrude_main(head)
+function Thirddata.zhpunc.protrude_main(head)
     local n = head
     while n do
         if n.id == hlist_id then
             local copy_list = node_copylist(n.head)
             -- 更改后再次包装为相同长度的vlist，即可重设胶性
-            local new_n = node_hpack( Moduledata.zhpunc.protrude(copy_list),n.width, "exactly")
+            local new_n = node_hpack( Thirddata.zhpunc.protrude(copy_list),n.width, "exactly")
             head, new_n = node_insertbefore(head, n, new_n)
             head, n = node_remove(head, n, true)
         else
@@ -741,8 +741,8 @@ function Moduledata.zhpunc.protrude_main(head)
 end
 
 -- 传参设置
-function Moduledata.zhpunc.set(pattern, spacequad, hangjian)
-    Moduledata.zhpunc.model = pattern
+function Thirddata.zhpunc.set(pattern, spacequad, hangjian)
+    Thirddata.zhpunc.model = pattern
     if hangjian == "false" then
         hangjian = false
     elseif hangjian == "true" then
@@ -750,20 +750,20 @@ function Moduledata.zhpunc.set(pattern, spacequad, hangjian)
     else
         hangjian = false
     end
-    Moduledata.zhpunc.hangjian = hangjian
-    Moduledata.zhpunc.space_quad = spacequad
+    Thirddata.zhpunc.hangjian = hangjian
+    Thirddata.zhpunc.space_quad = spacequad
 end
 
 -- 挂载/启动任务
-function Moduledata.zhpunc.append()
+function Thirddata.zhpunc.append()
     -- 预处理后（段落分行前）回调
-    nodes_tasks_appendaction("processors","after","Moduledata.zhpunc.process_puncs")
+    nodes_tasks_appendaction("processors","after","Thirddata.zhpunc.process_puncs")
     -- 段落分行后回调
-    -- nodes_tasks_appendaction("finalizers", "after", "Moduledata.zhpunc.align_left_puncs")
-    nodes_tasks_appendaction("finalizers", "after", "Moduledata.zhpunc.protrude_main")
+    -- nodes_tasks_appendaction("finalizers", "after", "Thirddata.zhpunc.align_left_puncs")
+    nodes_tasks_appendaction("finalizers", "after", "Thirddata.zhpunc.protrude_main")
 end
 
-function Moduledata.zhpunc.update_protrusions()
+function Thirddata.zhpunc.update_protrusions()
     -- 合并两表到新表myvector，而不是修改font-ext.lua中的vectors.quality
     -- TODO 补齐，使用实测数据并缓存
     -- 横排时    
@@ -812,7 +812,7 @@ function Moduledata.zhpunc.update_protrusions()
         -- [0xff0f] = puncs_half_junction, -- ／   Solidus
     }
     -- 竖排时更新
-    if Moduledata.vtypeset.appended then -- 检测不到Moduledata.vtypeset.appended
+    if Thirddata.vtypeset.appended then -- 检测不到Thirddata.vtypeset.appended
         local puncs_to_rotated = {
             [0x3001] = {0, 0.65},   -- 、
             [0xFF0C] = {0, 0.55},   -- ，
@@ -843,8 +843,8 @@ function Moduledata.zhpunc.update_protrusions()
     context.definedfont({"Serif*default"})
 
 end
--- Moduledata.zhpunc.update_protrusions() --更新标点悬挂数据
+-- Thirddata.zhpunc.update_protrusions() --更新标点悬挂数据
 
-return Moduledata.zhpunc
+return Thirddata.zhpunc
 
 

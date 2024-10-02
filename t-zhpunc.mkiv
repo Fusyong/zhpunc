@@ -22,7 +22,7 @@
 % 传参设置命令
 % local named_values = utilities.parsers.settings_to_hash(keyvals)
 \def\zhpuncset[#1][#2][#3]{%
-    \ctxlua{Moduledata.zhpunc.set([==[#1]==], [==[#2]==], [==[#3]==])}%
+    \ctxlua{Thirddata.zhpunc.set([==[#1]==], [==[#2]==], [==[#3]==])}%
 }
 % \currentmoduleparameter{pattern}
 % \moduleparameter{zhpunc}{pattern}
@@ -30,7 +30,7 @@
 
 % 在指定位置（\everystarttext）插入/应用命令
 \def\zhpuncappend{%
-    \ctxlua{Moduledata.zhpunc.append()}%
+    \ctxlua{Thirddata.zhpunc.append()}%
 }
 \appendtoks \zhpuncappend \to \everystarttext
 
