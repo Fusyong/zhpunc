@@ -159,7 +159,7 @@ local puncs = {
     [0xff5e] = puncs_full_junction, -- ～ 一字线
 
     -- 半角连接号
-    [0x00b7] = puncs_half_junction, -- ·   MIDDLE DOT
+    -- [0x00b7] = puncs_half_junction, -- ·   MIDDLE DOT
     -- 不处理半角字符
     -- [0x002D] = puncs_half_junction, -- -   Hyphen-Minus. Will there be any side effects?
     -- [0x002F] = puncs_half_junction, -- /   Solidus
